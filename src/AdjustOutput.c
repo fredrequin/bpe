@@ -19,7 +19,7 @@ Nov. 3, 2006
 #include <math.h>
 #include "global.h"
 
-extern long DeConvTwosComp(DWORD32 complement, short leftmost);
+extern long DeConvTwosComp(uint32_t complement, short leftmost);
 
 void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)// need to adjust the output
 {
@@ -30,7 +30,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
    short beta_1 = 0;
    short beta_2 = 0;
    float refinement = 0;
-   DWORD32 BitPlaneCheck = 0; // to check if a bit plane has bit 1.
+   uint32_t BitPlaneCheck = 0; // to check if a bit plane has bit 1.
    int TotalBlocks = (int)PtrCoding->PtrHeader->Header.Part3.S_20Bits;
 
    // determine the stages to do the decoding process.
@@ -49,11 +49,11 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
    {
       /* The following line is buggy: */
       /*
-      *(*BlockCodingInfo[i].PtrBlockAddress) = DeConvTwosComp((DWORD32)(BlockCodingInfo[i].ShiftedDC + BlockCodingInfo[i].DecodingDCRemainder),
+      *(*BlockCodingInfo[i].PtrBlockAddress) = DeConvTwosComp((uint32_t)(BlockCodingInfo[i].ShiftedDC + BlockCodingInfo[i].DecodingDCRemainder),
          PtrCoding->PtrHeader->Header.Part1.BitDepthDC_5Bits);
       */
       /* Here's the bug fix (Aaron Kiely, June 25,2008) */
-      *(*BlockCodingInfo[i].PtrBlockAddress) = DeConvTwosComp((DWORD32)((long int)BlockCodingInfo[i].ShiftedDC + (long int)BlockCodingInfo[i].DecodingDCRemainder),
+      *(*BlockCodingInfo[i].PtrBlockAddress) = DeConvTwosComp((uint32_t)((long int)BlockCodingInfo[i].ShiftedDC + (long int)BlockCodingInfo[i].DecodingDCRemainder),
          PtrCoding->PtrHeader->Header.Part1.BitDepthDC_5Bits);
 
       *(*BlockCodingInfo[i].PtrBlockAddressFloating)  = (float) (*(*BlockCodingInfo[i].PtrBlockAddress));
@@ -128,7 +128,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                // have to make a decision if the pixels is newly selected at this stage.
                                // If it is, then add the beta1,
                                // else because the refinement bits have not yet decoded, add beta2
-                               if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                               if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                   refinement = beta_2;
                                else
                                   refinement = beta_1;
@@ -165,7 +165,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                if((m <= PtrCoding->DecodingStopLocations.X_LocationStopDecoding) &&
                                   (n <= PtrCoding->DecodingStopLocations.Y_LocationStopDecoding ))
                                {
-                                  if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                  if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                      refinement = beta_2;
                                   else
                                      refinement = beta_1;
@@ -183,7 +183,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                else if (( PtrCoding->DecodingStopLocations.X_LocationStopDecoding == 1)
                                   && ( PtrCoding->DecodingStopLocations.Y_LocationStopDecoding == 0))
                                {
-                                  if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                  if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                      refinement = beta_2;
                                   else
                                      refinement = beta_1;
@@ -239,7 +239,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                          }
                          else if  ((m <= 1) && (n <= 1))  //parent and grandchildren //parent
                          {
-                             if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                             if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                   refinement = beta_2;
                                else
                                   refinement = beta_1;
@@ -259,7 +259,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                             if (i<  PtrCoding->DecodingStopLocations.BlockNoStopDecoding)
                             {
 
-                               if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                               if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                   refinement = beta_2;
                                else
                                   refinement = beta_1;
@@ -290,7 +290,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
 
                             else   // current block
                             { // children
-                               if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                               if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                   refinement = beta_2;
                                else
                                   refinement = beta_1;
@@ -429,7 +429,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                      {
                                         if  (m < 2 || n < 2)
                                         {
-                                              if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                              if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -461,7 +461,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                            }
                                            else
                                            {
-                                              if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                              if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -510,7 +510,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                          if ((m <= 3  && n <= 3))
                          {
 
-                           if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                           if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                               refinement = beta_2;
                            else
                               refinement = beta_1;
@@ -530,7 +530,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                             if (i < PtrCoding->DecodingStopLocations.BlockNoStopDecoding)
                             {
 
-                           if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                           if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                               refinement = beta_2;
                            else
                               refinement = beta_1;
@@ -598,7 +598,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                        else
                                        {
 
-                                          if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                          if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                              refinement = beta_2;
                                           else
                                              refinement = beta_1;
@@ -631,7 +631,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                            }
                                         else
                                         {
-                                              if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                              if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -651,7 +651,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                     }
                                     else   if (PtrCoding->DecodingStopLocations.X_LocationStopDecoding < 2)
                                     {
-                                       if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                       if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                           refinement = beta_2;
                                        else
                                           refinement = beta_1;
@@ -727,7 +727,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                  }
                                     else if  (PtrCoding->DecodingStopLocations.Y_LocationStopDecoding < 6)
                                     {
-                                       if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                       if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                           refinement = beta_2;
                                        else
                                           refinement = beta_1;
@@ -805,7 +805,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                     }
                                     else // last 2x2 block in upper right grandchildren block
                                     {
-                                       if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                       if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                           refinement = beta_2;
                                        else
                                           refinement = beta_1;
@@ -873,7 +873,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                     if ( m < 4)
                                  {
 
-                                    if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                    if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                        refinement = beta_2;
                                     else
                                        refinement = beta_1;
@@ -889,7 +889,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                  }
                                  else if (n >= 4)
                                  {
-                                    if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                    if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                        refinement = beta_2;
                                     else
                                        refinement = beta_1;
@@ -925,7 +925,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                        else
                                        {
 
-                                          if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                          if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                              refinement = beta_2;
                                           else
                                              refinement = beta_1;
@@ -958,7 +958,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                            }
                                         else
                                         {
-                                              if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                              if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -978,7 +978,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                     }
                                     else   if (PtrCoding->DecodingStopLocations.X_LocationStopDecoding < 6)
                                     {
-                                       if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                       if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                           refinement = beta_2;
                                        else
                                           refinement = beta_1;
@@ -1054,7 +1054,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                  }
                                     else if  (PtrCoding->DecodingStopLocations.Y_LocationStopDecoding < 2)  // the 3rd 2 * 2 block
                                     {
-                                       if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                       if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                           refinement = beta_2;
                                        else
                                           refinement = beta_1;
@@ -1132,7 +1132,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                     }
                                     else // last 2x2 block in upper right grandchildren block
                                     {
-                                       if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                       if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                           refinement = beta_2;
                                        else
                                           refinement = beta_1;
@@ -1199,7 +1199,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                               {
                                  if  (m  < 4 || n < 4)
                                   {
-                                    if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                    if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                     refinement = beta_2;
                                  else
                                     refinement = beta_1;
@@ -1234,7 +1234,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                        else
                                        {
 
-                                          if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                          if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                              refinement = beta_2;
                                           else
                                              refinement = beta_1;
@@ -1267,7 +1267,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                            }
                                         else
                                         {
-                                              if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                              if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -1287,7 +1287,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                     }
                                     else   if (PtrCoding->DecodingStopLocations.X_LocationStopDecoding < 6)
                                     {
-                                       if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                       if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                           refinement = beta_2;
                                        else
                                           refinement = beta_1;
@@ -1363,7 +1363,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                  }
                                     else if  (PtrCoding->DecodingStopLocations.Y_LocationStopDecoding < 6)
                                     {
-                                       if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                       if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                           refinement = beta_2;
                                        else
                                           refinement = beta_1;
@@ -1441,7 +1441,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                     }
                                     else // last 2x2 block in upper right grandchildren block
                                     {
-                                       if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                       if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                           refinement = beta_2;
                                        else
                                           refinement = beta_1;
@@ -1555,7 +1555,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                            if ((m == 0 && n == 0) || (BlockCodingInfo[i].PtrBlockAddress[m][n] == 0))
                               continue;
 
-                            if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                            if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                refinement = beta_2;
                             else
                               refinement = beta_1;
@@ -1601,7 +1601,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                   else if (( PtrCoding->DecodingStopLocations.X_LocationStopDecoding == 1)
                                      && ( PtrCoding->DecodingStopLocations.Y_LocationStopDecoding == 0))
                                   {
-                                     if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                     if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                         refinement = beta_2;
                                      else
                                         refinement = beta_1;
@@ -1617,7 +1617,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                   }
                                   else
                                  {
-                                    if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                    if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                         refinement = beta_2;
                                      else
                                         refinement = beta_1;
@@ -1652,7 +1652,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                   }
                                   else if (m > 3 || n > 3)
                                   {
-                                      if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                      if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                          refinement = beta_2;
                                       else
                                          refinement = beta_1;
@@ -1673,7 +1673,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
 
                                         if (m > 1)
                                         {
-                                           if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                           if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -1716,7 +1716,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                            }
                                         else
                                         {
-                                              if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                              if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -1752,7 +1752,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                         else if (n >= 2)
 
                                         {
-                                           if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                           if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -1797,7 +1797,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                            }
                                         else
                                         {
-                                              if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                              if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -1857,7 +1857,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                            }
                                         else
                                         {
-                                              if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                              if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -1895,7 +1895,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                               {
                                  if ( m >= 4)
                                  {
-                                    if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                    if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                        refinement = beta_2;
                                     else
                                        refinement = beta_1;
@@ -1916,7 +1916,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                     {
                                        if (m >= 2 || n >= 6)
                                        {
-                                          if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                          if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                              refinement = beta_2;
                                           else
                                              refinement = beta_1;
@@ -1961,7 +1961,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                            }
                                         else
                                         {
-                                              if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                              if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -1996,7 +1996,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                        }
                                        else if (m >= 2)
                                        {
-                                          if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                          if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                              refinement = beta_2;
                                           else
                                              refinement = beta_1;
@@ -2040,7 +2040,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                            }
                                           else
                                         {
-                                              if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                              if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -2073,7 +2073,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                        }
                                        else if (n >= 6)
                                        {
-                                          if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                          if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -2120,7 +2120,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                            }
                                         else
                                         {
-                                              if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                              if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -2182,7 +2182,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                            }
                                           else
                                         {
-                                              if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                              if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -2217,7 +2217,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                  }
                                  else if (n >= 4)
                                  {
-                                    if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                    if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                        refinement = beta_2;
                                     else
                                        refinement = beta_1;
@@ -2238,7 +2238,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                     {
                                        if (m >= 6 || n >= 2)
                                        {
-                                          if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                          if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                              refinement = beta_2;
                                           else
                                              refinement = beta_1;
@@ -2283,7 +2283,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                            }
                                         else
                                         {
-                                              if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                              if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -2318,7 +2318,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                        }
                                        else if (m >= 6)
                                        {
-                                          if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                          if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                              refinement = beta_2;
                                           else
                                              refinement = beta_1;
@@ -2362,7 +2362,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                            }
                                           else
                                         {
-                                              if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                              if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -2395,7 +2395,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                        }
                                        else if (n >= 2)
                                        {
-                                          if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                          if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -2442,7 +2442,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                            }
                                         else
                                         {
-                                              if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                              if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -2504,7 +2504,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                            }
                                           else
                                         {
-                                              if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                              if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -2550,7 +2550,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                     {
                                        if (m >= 6 || n >= 6)
                                        {
-                                          if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                          if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                              refinement = beta_2;
                                           else
                                              refinement = beta_1;
@@ -2595,7 +2595,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                            }
                                         else
                                         {
-                                              if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                              if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -2630,7 +2630,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                        }
                                        else if (m >= 6)
                                        {
-                                          if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                          if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                              refinement = beta_2;
                                           else
                                              refinement = beta_1;
@@ -2674,7 +2674,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                            }
                                           else
                                         {
-                                              if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                              if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -2707,7 +2707,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                        }
                                        else if (n >= 6)
                                        {
-                                          if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                          if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -2754,7 +2754,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                            }
                                         else
                                         {
-                                              if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                              if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -2816,7 +2816,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                            }
                                           else
                                         {
-                                              if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                              if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -2900,7 +2900,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                // have to make a decision if the pixels is newly selected at this stage.
                                // If it is, then add the beta1,
                                // else because the refinement bits have not yet decoded, add beta2
-                               if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                               if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                   refinement = beta_2;
                                else
                                   refinement = beta_1;
@@ -2937,7 +2937,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                if((m <= PtrCoding->DecodingStopLocations.X_LocationStopDecoding) &&
                                   (n <= PtrCoding->DecodingStopLocations.Y_LocationStopDecoding ))
                                {
-                                  if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                  if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                      refinement = beta_2;
                                   else
                                      refinement = beta_1;
@@ -2955,7 +2955,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                else if (( PtrCoding->DecodingStopLocations.X_LocationStopDecoding == 1)
                                   && ( PtrCoding->DecodingStopLocations.Y_LocationStopDecoding == 0))
                                {
-                                  if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                  if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                      refinement = beta_2;
                                   else
                                      refinement = beta_1;
@@ -3011,7 +3011,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                          }
                          else if  ((m <= 1) && (n <= 1))  //parent and grandchildren //parent
                          {
-                             if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                             if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                   refinement = beta_2;
                                else
                                   refinement = beta_1;
@@ -3031,7 +3031,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                             if (i<  PtrCoding->DecodingStopLocations.BlockNoStopDecoding)
                             {
 
-                               if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                               if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                   refinement = beta_2;
                                else
                                   refinement = beta_1;
@@ -3064,7 +3064,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
 
                             else   // current block
                             { // children
-                               if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                               if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                   refinement = beta_2;
                                else
                                   refinement = beta_1;
@@ -3204,7 +3204,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                      {
                                         if  (m < 2 || n < 2)
                                         {
-                                              if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                              if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -3236,7 +3236,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                            }
                                            else
                                            {
-                                              if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                              if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -3285,7 +3285,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                          if ((m <= 3  && n <= 3))
                          {
 
-                           if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                           if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                               refinement = beta_2;
                            else
                               refinement = beta_1;
@@ -3305,7 +3305,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                             if (i < PtrCoding->DecodingStopLocations.BlockNoStopDecoding)
                             {
 
-                           if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                           if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                               refinement = beta_2;
                            else
                               refinement = beta_1;
@@ -3373,7 +3373,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                        else
                                        {
 
-                                          if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                          if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                              refinement = beta_2;
                                           else
                                              refinement = beta_1;
@@ -3406,7 +3406,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                            }
                                         else
                                         {
-                                              if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                              if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -3426,7 +3426,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                     }
                                     else   if (PtrCoding->DecodingStopLocations.X_LocationStopDecoding < 2)
                                     {
-                                       if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                       if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                           refinement = beta_2;
                                        else
                                           refinement = beta_1;
@@ -3502,7 +3502,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                  }
                                     else if  (PtrCoding->DecodingStopLocations.Y_LocationStopDecoding < 6)
                                     {
-                                       if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                       if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                           refinement = beta_2;
                                        else
                                           refinement = beta_1;
@@ -3580,7 +3580,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                     }
                                     else // last 2x2 block in upper right grandchildren block
                                     {
-                                       if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                       if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                           refinement = beta_2;
                                        else
                                           refinement = beta_1;
@@ -3648,7 +3648,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                     if ( m < 4)
                                  {
 
-                                    if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                    if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                        refinement = beta_2;
                                     else
                                        refinement = beta_1;
@@ -3664,7 +3664,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                  }
                                  else if (n >= 4)
                                  {
-                                    if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                    if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                        refinement = beta_2;
                                     else
                                        refinement = beta_1;
@@ -3700,7 +3700,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                        else
                                        {
 
-                                          if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                          if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                              refinement = beta_2;
                                           else
                                              refinement = beta_1;
@@ -3733,7 +3733,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                            }
                                         else
                                         {
-                                              if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                              if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -3753,7 +3753,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                     }
                                     else   if (PtrCoding->DecodingStopLocations.X_LocationStopDecoding < 6)
                                     {
-                                       if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                       if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                           refinement = beta_2;
                                        else
                                           refinement = beta_1;
@@ -3829,7 +3829,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                  }
                                     else if  (PtrCoding->DecodingStopLocations.Y_LocationStopDecoding < 2)  // the 3rd 2 * 2 block
                                     {
-                                       if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                       if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                           refinement = beta_2;
                                        else
                                           refinement = beta_1;
@@ -3907,7 +3907,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                     }
                                     else // last 2x2 block in upper right grandchildren block
                                     {
-                                       if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                       if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                           refinement = beta_2;
                                        else
                                           refinement = beta_1;
@@ -3974,7 +3974,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                               {
                                  if  (m  < 4 || n < 4)
                                   {
-                                    if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                    if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                     refinement = beta_2;
                                  else
                                     refinement = beta_1;
@@ -4009,7 +4009,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                        else
                                        {
 
-                                          if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                          if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                              refinement = beta_2;
                                           else
                                              refinement = beta_1;
@@ -4042,7 +4042,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                            }
                                         else
                                         {
-                                              if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                              if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -4062,7 +4062,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                     }
                                     else   if (PtrCoding->DecodingStopLocations.X_LocationStopDecoding < 6)
                                     {
-                                       if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                       if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                           refinement = beta_2;
                                        else
                                           refinement = beta_1;
@@ -4138,7 +4138,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                  }
                                     else if  (PtrCoding->DecodingStopLocations.Y_LocationStopDecoding < 6)
                                     {
-                                       if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                       if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                           refinement = beta_2;
                                        else
                                           refinement = beta_1;
@@ -4216,7 +4216,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                     }
                                     else // last 2x2 block in upper right grandchildren block
                                     {
-                                       if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                       if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                           refinement = beta_2;
                                        else
                                           refinement = beta_1;
@@ -4330,7 +4330,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                            if ((m == 0 && n == 0) || (BlockCodingInfo[i].PtrBlockAddress[m][n] == 0))
                               continue;
 
-                           if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                           if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                               refinement = beta_2;
                            else
                               refinement = beta_1;
@@ -4376,7 +4376,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                   else if (( PtrCoding->DecodingStopLocations.X_LocationStopDecoding == 1)
                                      && ( PtrCoding->DecodingStopLocations.Y_LocationStopDecoding == 0))
                                   {
-                                     if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                     if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                         refinement = beta_2;
                                      else
                                         refinement = beta_1;
@@ -4392,7 +4392,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                   }
                                   else
                                  {
-                                    if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                    if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                         refinement = beta_2;
                                      else
                                         refinement = beta_1;
@@ -4427,7 +4427,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                   }
                                   else if (m > 3 || n > 3)
                                   {
-                                      if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                      if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                          refinement = beta_2;
                                       else
                                          refinement = beta_1;
@@ -4448,7 +4448,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
 
                                         if (m > 1)
                                         {
-                                           if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                           if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -4491,7 +4491,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                            }
                                         else
                                         {
-                                              if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                              if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -4527,7 +4527,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                         else if (n >= 2)
 
                                         {
-                                           if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                           if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -4572,7 +4572,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                            }
                                         else
                                         {
-                                              if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                              if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -4632,7 +4632,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                            }
                                         else
                                         {
-                                              if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                              if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -4670,7 +4670,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                               {
                                  if ( m >= 4)
                                  {
-                                    if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                    if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                        refinement = beta_2;
                                     else
                                        refinement = beta_1;
@@ -4691,7 +4691,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                     {
                                        if (m >= 2 || n >= 6)
                                        {
-                                          if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                          if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                              refinement = beta_2;
                                           else
                                              refinement = beta_1;
@@ -4736,7 +4736,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                            }
                                         else
                                         {
-                                              if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                              if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -4771,7 +4771,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                        }
                                        else if (m >= 2)
                                        {
-                                          if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                          if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                              refinement = beta_2;
                                           else
                                              refinement = beta_1;
@@ -4815,7 +4815,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                            }
                                           else
                                         {
-                                              if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                              if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -4848,7 +4848,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                        }
                                        else if (n >= 6)
                                        {
-                                          if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                          if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -4895,7 +4895,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                            }
                                         else
                                         {
-                                              if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                              if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -4957,7 +4957,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                            }
                                           else
                                         {
-                                              if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                              if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -4992,7 +4992,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                  }
                                  else if (n >= 4)
                                  {
-                                    if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                    if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                        refinement = beta_2;
                                     else
                                        refinement = beta_1;
@@ -5013,7 +5013,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                     {
                                        if (m >= 6 || n >= 2)
                                        {
-                                          if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                          if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                              refinement = beta_2;
                                           else
                                              refinement = beta_1;
@@ -5058,7 +5058,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                            }
                                         else
                                         {
-                                              if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                              if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -5093,7 +5093,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                        }
                                        else if (m >= 6)
                                        {
-                                          if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                          if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                              refinement = beta_2;
                                           else
                                              refinement = beta_1;
@@ -5137,7 +5137,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                            }
                                           else
                                         {
-                                              if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                              if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -5170,7 +5170,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                        }
                                        else if (n >= 2)
                                        {
-                                          if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                          if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -5217,7 +5217,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                            }
                                         else
                                         {
-                                              if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                              if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -5279,7 +5279,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                            }
                                           else
                                         {
-                                              if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                              if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -5325,7 +5325,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                     {
                                        if (m >= 6 || n >= 6)
                                        {
-                                          if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                          if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                              refinement = beta_2;
                                           else
                                              refinement = beta_1;
@@ -5370,7 +5370,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                            }
                                         else
                                         {
-                                              if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                              if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -5405,7 +5405,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                        }
                                        else if (m >= 6)
                                        {
-                                          if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                          if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                              refinement = beta_2;
                                           else
                                              refinement = beta_1;
@@ -5449,7 +5449,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                            }
                                           else
                                         {
-                                              if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                              if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -5482,7 +5482,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                        }
                                        else if (n >= 6)
                                        {
-                                          if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                          if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -5529,7 +5529,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                            }
                                         else
                                         {
-                                              if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                              if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;
@@ -5591,7 +5591,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                                            }
                                           else
                                         {
-                                              if  ((DWORD32) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
+                                              if  ((uint32_t) abs(BlockCodingInfo[i].PtrBlockAddress[m][n])  >  BitPlaneCheck) // not newly selected.
                                                  refinement = beta_2;
                                               else
                                                  refinement = beta_1;

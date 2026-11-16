@@ -33,9 +33,9 @@ extern void DWT_f97_2D(float **rows,
                   BOOL inverse);
 
 extern void lifting_M97_2D(int **rows,
-                     UINT32 ImgCols,
-                     UINT32 ImgRows,
-                     UINT32 levels,
+                     uint32_t ImgCols,
+                     uint32_t ImgRows,
+                     uint32_t levels,
                      BOOL inverse);
 
 extern void lifting_f97_2D(float **rows,
@@ -45,12 +45,12 @@ extern void lifting_f97_2D(float **rows,
                BOOL inverse);
 
 void CoefficientsRescaling(int **transformed,
-                     UINT32 Rows,
-                     UINT32 Cols,
+                     uint32_t Rows,
+                     uint32_t Cols,
                      HeaderPart4 StrHead4)
 {
-   UINT32 i = 0;
-   UINT32 j = 0;
+   uint32_t i = 0;
+   uint32_t j = 0;
    short scales[10] = {0};
 
    if (StrHead4.CustomWtFlag == TRUE)
@@ -276,8 +276,8 @@ void DWT_(StructCodingPara *PtrCoding,
 void DWT_Reverse(int **block,
              StructCodingPara *PtrCoding)
 {
-   UINT32 k = 0;
-   UINT32 p = 0;
+   uint32_t k = 0;
+   uint32_t p = 0;
 
    if(PtrCoding->PtrHeader->Header.Part4.DWTType == FLOAT_WAVELET)
    {
@@ -312,8 +312,8 @@ void DWT_Reverse(int **block,
 void DWT_ReverseFloating(float **block,
              StructCodingPara *PtrCoding)
 {
-   UINT32 k = 0;
-   UINT32 p = 0;
+   uint32_t k = 0;
+   uint32_t p = 0;
    float **temp_f = (float **)calloc(PtrCoding->ImageRows,sizeof(float *));
    for(k = 0; k < PtrCoding->ImageRows; k ++)
       temp_f[k] = (float *) calloc(PtrCoding->ImageWidth +PtrCoding->PadCols_3Bits,sizeof(float));

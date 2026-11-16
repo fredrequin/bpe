@@ -19,12 +19,12 @@ Nov. 3, 2006
 #include "global.h"
 
 
-long DeConvTwosComp(DWORD32 complement,
+long DeConvTwosComp(uint32_t complement,
                short leftmost);
 
 extern void HeaderOutput(StructCodingPara *PtrCoding);
 
-long DeConvTwosComp(DWORD32 complement,
+long DeConvTwosComp(uint32_t complement,
                short leftmost)
 {
 /*   To determine the integer value of a 2's complement code
@@ -41,10 +41,10 @@ Case #2            If the leftmost bit is 1:
         3.            5                      Determine the integer value of the pure binary code from step 2.
       4.            -5                                                                     Negate*/
 
-   DWORD32 temp = 0;
+   uint32_t temp = 0;
    long Original;
    short  i = 0;
-   if((leftmost >= sizeof(DWORD32) * 8) || (leftmost == 0))
+   if((leftmost >= sizeof(uint32_t) * 8) || (leftmost == 0))
       ErrorMsg(BPE_DATA_ERROR);
    if (((1 << (leftmost-1)) & complement) == 0)
       return (long)complement;
@@ -65,11 +65,11 @@ Case #2            If the leftmost bit is 1:
 
 
 
-DWORD32 ConvTwosComp(long Original,
+uint32_t ConvTwosComp(long Original,
                short leftmost);
 
 
-DWORD32 ConvTwosComp(long Original,
+uint32_t ConvTwosComp(long Original,
                short leftmost)
 {
 /*      To determine the 2's complement code for a number.
@@ -85,23 +85,23 @@ DWORD32 ConvTwosComp(long Original,
          2.            1111 1111 1111 1111 1111 1111 1111 1010      complement
          3.            1111 1111 1111 1111 1111 1111 1111 1011  add 1*/
 
-   DWORD32 temp;
-   DWORD32 complement;
+   uint32_t temp;
+   uint32_t complement;
    short i = 0;
 
    if(leftmost == 1)
     return 0;
 
-   if((leftmost >= sizeof(DWORD32) * 8) || (leftmost == 0))
+   if((leftmost >= sizeof(uint32_t) * 8) || (leftmost == 0))
    {
       ErrorMsg(BPE_DATA_ERROR);
    }
 
    if (Original >= 0)
-      return (DWORD32) Original;
+      return (uint32_t) Original;
    else
    {
-      complement = ~(DWORD32) (-Original);
+      complement = ~(uint32_t) (-Original);
       temp = 0;
       for ( i = 0; i < leftmost; i ++)
       {
@@ -127,11 +127,11 @@ void DCEncoder(StructCodingPara *PtrCoding,
    int k = 0;
    int min_k = 0;
 
-   DWORD32 min_bits = 0xFFFF;
-   DWORD32 total_bits = 0;
+   uint32_t min_bits = 0xFFFF;
+   uint32_t total_bits = 0;
 
    /* --- Begin bug fix (Kiely) --- */
-   UCHAR8 uncoded_flag = ~0;   // this is the flag indicating that uncoded option used
+   uint8_t uncoded_flag = ~0;   // this is the flag indicating that uncoded option used
 
    // determine code choice min_k to use, either via brute-force optimum calculation, or heuristic approach
    if(PtrCoding->PtrHeader->Header.Part3.OptDCSelect == TRUE) {  // brute-force optimum code selection
@@ -206,8 +206,8 @@ void DCEntropyEncoder(StructCodingPara* PtrCoding,
 {
    int Max_k = 0;
    int ID_Length = 0;
-   UINT32 GaggleStartIndex = 0;
-   UINT32 gaggles = 0;
+   uint32_t GaggleStartIndex = 0;
+   uint32_t gaggles = 0;
 
    if (PtrCoding->N  == 2) {
       Max_k = 0;
@@ -235,8 +235,8 @@ void DCEntropyEncoder(StructCodingPara* PtrCoding,
 
    if(PtrCoding->PtrHeader->Header.Part1.BitDepthAC_5Bits < PtrCoding->QuantizationFactorQ)
    {
-      UINT32 i;
-      UINT32 k;
+      uint32_t i;
+      uint32_t k;
 
       /* --- Begin bug fix (Kiely) --- */
       int numaddbitplanes;
@@ -267,13 +267,13 @@ void DCGaggleDecoding(StructCodingPara *PtrCoding,
 {
    long int i = 0;
    int counter = 0;
-   UCHAR8 min_k;
-   DWORD32 TempWord =0;
+   uint8_t min_k;
+   uint32_t TempWord =0;
    BOOL uncoded = FALSE;
 
    // makes the least ID_Length bits to ones.
    BitsRead(PtrCoding, &TempWord, ID_Length);
-   min_k = (UCHAR8) TempWord;
+   min_k = (uint8_t) TempWord;
 
    if( (ID_Length == 1 && min_k == 1) || (ID_Length == 2 && min_k == 3) ||
       (ID_Length == 3 && min_k == 7) || (ID_Length == 4 && min_k == 15))
@@ -321,7 +321,7 @@ short DCEntropyDecoder(StructCodingPara *PtrCoding,
    int Max_k = 0;
    int gaggles = 15;
    int GaggleStartIndex = 0;
-   UCHAR8 ID_Length = 0;
+   uint8_t ID_Length = 0;
 
    if ( PtrCoding->N == 2) {
       Max_k = 0;
@@ -359,9 +359,9 @@ void DPCM_DCMapper(BitPlaneBits *BlockInfo,
    long i = 0;
    long theta = 0;
    long X_Min = 0;
-   DWORD32 Bits1 = 0;
-   DWORD32 X_Max;
-   DWORD32 Max_Mapped = 0;
+   uint32_t Bits1 = 0;
+   uint32_t X_Max;
+   uint32_t Max_Mapped = 0;
    X_Min = - (1<<(N-1));
    X_Max = ((1<<(N-1)) - 1);
 
@@ -413,28 +413,28 @@ void DCEncoding(StructCodingPara *PtrCoding,
              BitPlaneBits *BlockInfo)
 
 {
-   WORD16 BitDepthDC = 0;
-   WORD16 BitDepthAC = 0;
-   WORD16 QuantizationFactorQ_prime;
-   UINT32 i;
-   UINT32 k;
-   UINT32 p;
+   uint16_t BitDepthDC = 0;
+   uint16_t BitDepthAC = 0;
+   uint16_t QuantizationFactorQ_prime;
+   uint32_t i;
+   uint32_t k;
+   uint32_t p;
 
-   SLONG ACBitMaxOneBlock = 1;
-   SLONG Max_DC = 0;
-   SLONG MaxACSegment = 0;
-   DWORD32 BlockIndex;
+   int32_t ACBitMaxOneBlock = 1;
+   int32_t Max_DC = 0;
+   int32_t MaxACSegment = 0;
+   uint32_t BlockIndex;
 
-   SLONG DC_Min = 0x10000;
-   SLONG DC_Max = -0x10000;
+   int32_t DC_Min = 0x10000;
+   int32_t DC_Max = -0x10000;
 
-   DWORD32 Temp_BitMaxDC = 0;
+   uint32_t Temp_BitMaxDC = 0;
 
    for(BlockIndex = PtrCoding->BlockCounter;
       BlockIndex < PtrCoding->BlockCounter + PtrCoding->PtrHeader->Header.Part3.S_20Bits;
       BlockIndex++)
    {
-      UINT32 IndexStart = BlockIndex - PtrCoding->BlockCounter;
+      uint32_t IndexStart = BlockIndex - PtrCoding->BlockCounter;
 
       BlockInfo[IndexStart].PtrBlockAddress = (BlockString + BlockIndex * BLOCK_SIZE) ;
 
@@ -448,7 +448,7 @@ void DCEncoding(StructCodingPara *PtrCoding,
       if ((AMPLITUDE(BlockInfo[IndexStart].PtrBlockAddress[0][0])) > AMPLITUDE(Max_DC) )
          Max_DC = BlockInfo[IndexStart].PtrBlockAddress[0][0];
 
-      if ((DWORD32)(AMPLITUDE(BlockInfo[IndexStart].PtrBlockAddress[0][0])) > Temp_BitMaxDC )
+      if ((uint32_t)(AMPLITUDE(BlockInfo[IndexStart].PtrBlockAddress[0][0])) > Temp_BitMaxDC )
          Temp_BitMaxDC =AMPLITUDE(BlockInfo[IndexStart].PtrBlockAddress[0][0]);
 
       if (BlockInfo[IndexStart].PtrBlockAddress[0][0] > DC_Max)
@@ -463,14 +463,14 @@ void DCEncoding(StructCodingPara *PtrCoding,
       for (k = 0; k < BLOCK_SIZE; k ++)
          for (p = 0; p < BLOCK_SIZE; p++)
          {
-            UINT32 AbsAC = 0;
+            uint32_t AbsAC = 0;
             if ( k == 0 && p ==0)
                continue;
 
             AbsAC = AMPLITUDE(BlockInfo[IndexStart].PtrBlockAddress[k][p]);
-            if((SLONG) AbsAC > ACBitMaxOneBlock)
+            if((int32_t) AbsAC > ACBitMaxOneBlock)
                ACBitMaxOneBlock = AbsAC;
-            if((SLONG)AbsAC > MaxACSegment)
+            if((int32_t)AbsAC > MaxACSegment)
                MaxACSegment = AbsAC;
          }
       BlockInfo[IndexStart].BitMaxAC = 0;
@@ -510,7 +510,7 @@ void DCEncoding(StructCodingPara *PtrCoding,
    }
    else
    {
-      DWORD32 temp = -Max_DC;
+      uint32_t temp = -Max_DC;
       while (temp > 0)
       {
          temp >>= 1;
@@ -547,7 +547,7 @@ void DCEncoding(StructCodingPara *PtrCoding,
       PtrCoding->QuantizationFactorQ = max(QuantizationFactorQ_prime,
           PtrCoding->PtrHeader->Header.Part4.CustomWtLL3_2bits);
    else
-      PtrCoding->QuantizationFactorQ = (UCHAR8) QuantizationFactorQ_prime;
+      PtrCoding->QuantizationFactorQ = (uint8_t) QuantizationFactorQ_prime;
 
    /////////////////////////  Shift the DC component //////////////////////
 
@@ -556,9 +556,9 @@ void DCEncoding(StructCodingPara *PtrCoding,
 
    for(i = 0; i < PtrCoding->PtrHeader->Header.Part3.S_20Bits; i ++)// shift the DC component to the right
    {
-      DWORD32 NewNum = ConvTwosComp(BlockInfo[i].PtrBlockAddress[0][0], BitDepthDC);
+      uint32_t NewNum = ConvTwosComp(BlockInfo[i].PtrBlockAddress[0][0], BitDepthDC);
       BlockInfo[i].ShiftedDC = (NewNum >> PtrCoding->QuantizationFactorQ);
-      BlockInfo[i].DCRemainder = (WORD16)(NewNum & k);
+      BlockInfo[i].DCRemainder = (uint16_t)(NewNum & k);
    }
 
    PtrCoding->N = max(PtrCoding->PtrHeader->Header.Part1.BitDepthDC_5Bits
@@ -600,12 +600,12 @@ void DPCM_DCDeMapper(BitPlaneBits *BlockInfo,
 
    long theta = 0;
    long i;
-   DWORD32 X_Max = (1 << (N-1)) - 1;
+   uint32_t X_Max = (1 << (N-1)) - 1;
    long X_Min = - (1<< (N-1));
 
    long * diff_DC;
 
-   DWORD32 Bits1 = 0;
+   uint32_t Bits1 = 0;
 
    diff_DC = (long *)calloc(size,sizeof(long));
 
@@ -649,11 +649,11 @@ void DPCM_DCDeMapper(BitPlaneBits *BlockInfo,
 
 short DCDeCoding(StructCodingPara *PtrCoding,  StructFreBlockString *StrBlocks,  BitPlaneBits *BlockInfo)
 {
-   UINT32 i;
+   uint32_t i;
    int k;
    short BitDepthDC;
    short BitDepthAC;
-   WORD16 QuantizationFactorQ_prime;
+   uint16_t QuantizationFactorQ_prime;
 
    BitDepthDC = PtrCoding->PtrHeader->Header.Part1.BitDepthDC_5Bits;
    BitDepthAC = PtrCoding->PtrHeader->Header.Part1.BitDepthAC_5Bits;
@@ -682,7 +682,7 @@ short DCDeCoding(StructCodingPara *PtrCoding,  StructFreBlockString *StrBlocks, 
       PtrCoding->QuantizationFactorQ = max(QuantizationFactorQ_prime,
           PtrCoding->PtrHeader->Header.Part4.CustomWtLL3_2bits);
    else
-      PtrCoding->QuantizationFactorQ = (UCHAR8) QuantizationFactorQ_prime;
+      PtrCoding->QuantizationFactorQ = (uint8_t) QuantizationFactorQ_prime;
    // 2.2 Sample-spit entropy for bit shifted DC's
    PtrCoding->N = max(PtrCoding->PtrHeader->Header.Part1.BitDepthDC_5Bits    - PtrCoding->QuantizationFactorQ, 1);
 
@@ -702,7 +702,7 @@ short DCDeCoding(StructCodingPara *PtrCoding,  StructFreBlockString *StrBlocks, 
    if(PtrCoding->QuantizationFactorQ > PtrCoding->PtrHeader->Header.Part1.BitDepthAC_5Bits)
    {
       int numaddbitplanes;
-      DWORD32 TempWord;
+      uint32_t TempWord;
 
       // calculate number of additional bit planes to include in DC coefficient coding (section 4.3.3 of the recommendation)
       if (PtrCoding->PtrHeader->Header.Part4.DWTType == INTEGER_WAVELET)
@@ -721,7 +721,7 @@ short DCDeCoding(StructCodingPara *PtrCoding,  StructFreBlockString *StrBlocks, 
 
    PtrCoding->N = PtrCoding->PtrHeader->Header.Part1.BitDepthDC_5Bits - PtrCoding->QuantizationFactorQ;
 
-   for(i = 0; i <(UINT32) PtrCoding->PtrHeader->Header.Part3.S_20Bits; i ++) {
+   for(i = 0; i <(uint32_t) PtrCoding->PtrHeader->Header.Part3.S_20Bits; i ++) {
       // shift the DC component to the right
       BlockInfo[i].ShiftedDC <<= PtrCoding->QuantizationFactorQ;
       *(*BlockInfo[i].PtrBlockAddress) = DeConvTwosComp(BlockInfo[i].ShiftedDC, PtrCoding->PtrHeader->Header.Part1.BitDepthDC_5Bits);

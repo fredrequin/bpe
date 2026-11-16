@@ -203,7 +203,7 @@ void HeaderOutput(StructCodingPara *PtrCoding)
 }
 void HeaderReadin(StructCodingPara *PtrCoding)
 {
-   DWORD32 Byte;
+   uint32_t Byte;
 
    BitsRead(PtrCoding, &Byte, 1);
    PtrCoding->PtrHeader->Header.Part1.StartImgFlag = (BOOL)Byte;
@@ -211,16 +211,16 @@ void HeaderReadin(StructCodingPara *PtrCoding)
    PtrCoding->PtrHeader->Header.Part1.EngImgFlg = (BOOL)Byte;
 
    BitsRead(PtrCoding, &Byte, 8);
-   PtrCoding->PtrHeader->Header.Part1.SegmentCount_8Bits = (UCHAR8)Byte;
+   PtrCoding->PtrHeader->Header.Part1.SegmentCount_8Bits = (uint8_t)Byte;
 
    BitsRead(PtrCoding, &Byte, 5);
-   PtrCoding->PtrHeader->Header.Part1.BitDepthDC_5Bits = (UCHAR8)Byte;
+   PtrCoding->PtrHeader->Header.Part1.BitDepthDC_5Bits = (uint8_t)Byte;
 
    BitsRead(PtrCoding, &Byte, 5);
-   PtrCoding->PtrHeader->Header.Part1.BitDepthAC_5Bits = (UCHAR8)Byte;
+   PtrCoding->PtrHeader->Header.Part1.BitDepthAC_5Bits = (uint8_t)Byte;
 
    BitsRead(PtrCoding, &Byte, 1);
-   PtrCoding->PtrHeader->Header.Part1.Reserved = (UCHAR8)Byte;
+   PtrCoding->PtrHeader->Header.Part1.Reserved = (uint8_t)Byte;
 
    BitsRead(PtrCoding, &Byte, 1);
    PtrCoding->PtrHeader->Header.Part1.Part2Flag = (BOOL)Byte;
@@ -234,9 +234,9 @@ void HeaderReadin(StructCodingPara *PtrCoding)
    if((PtrCoding->PtrHeader->Header.Part1).EngImgFlg == TRUE)
    {
       BitsRead(PtrCoding, &Byte, 3);
-      PtrCoding->PtrHeader->Header.Part1.PadRows_3Bits= (UCHAR8)Byte;
+      PtrCoding->PtrHeader->Header.Part1.PadRows_3Bits= (uint8_t)Byte;
       BitsRead(PtrCoding, &Byte, 5);
-      PtrCoding->PtrHeader->Header.Part1.Reserved_5Bits= (UCHAR8)Byte;
+      PtrCoding->PtrHeader->Header.Part1.Reserved_5Bits= (uint8_t)Byte;
    }
 
    if(PtrCoding->PtrHeader->Header.Part1.Part2Flag == TRUE)
@@ -248,16 +248,16 @@ void HeaderReadin(StructCodingPara *PtrCoding)
       PtrCoding->PtrHeader->Header.Part2.DCstop = (BOOL)Byte; //indicate whether the compressed output stops.
 
       BitsRead(PtrCoding, &Byte, 5);
-      PtrCoding->PtrHeader->Header.Part2.BitPlaneStop_5Bits = (UCHAR8)Byte;
+      PtrCoding->PtrHeader->Header.Part2.BitPlaneStop_5Bits = (uint8_t)Byte;
 
       BitsRead(PtrCoding, &Byte, 2);
-      PtrCoding->PtrHeader->Header.Part2.StageStop_2Bits = (UCHAR8)Byte;
+      PtrCoding->PtrHeader->Header.Part2.StageStop_2Bits = (uint8_t)Byte;
 
       BitsRead(PtrCoding, &Byte, 1);
       PtrCoding->PtrHeader->Header.Part2.UseFill = (BOOL)Byte;
 
       BitsRead(PtrCoding, &Byte, 4);
-      PtrCoding->PtrHeader->Header.Part2.Reserved_4Bits = (UCHAR8)Byte; // 4 bits
+      PtrCoding->PtrHeader->Header.Part2.Reserved_4Bits = (uint8_t)Byte; // 4 bits
    }
 
    if((PtrCoding->PtrHeader->Header.Part1).Part3Flag == TRUE)
@@ -267,7 +267,7 @@ void HeaderReadin(StructCodingPara *PtrCoding)
       PtrCoding->PtrHeader->Header.Part3.S_20Bits = Byte;
       if(PtrCoding->BitsPerPixel != 0)
       {
-         PtrCoding->DecodingAllowedBitsSizeInSegment = (DWORD32)(PtrCoding->BitsPerPixel *
+         PtrCoding->DecodingAllowedBitsSizeInSegment = (uint32_t)(PtrCoding->BitsPerPixel *
                PtrCoding->PtrHeader->Header.Part3.S_20Bits * 64);
 
          if (PtrCoding->DecodingAllowedBitsSizeInSegment > (PtrCoding->PtrHeader->Header.Part2.SegByteLimit_27Bits  << 3))
@@ -287,7 +287,7 @@ void HeaderReadin(StructCodingPara *PtrCoding)
       PtrCoding->PtrHeader->Header.Part3.OptACSelect = (BOOL)Byte;
 
       BitsRead(PtrCoding, &Byte, 2);
-      PtrCoding->PtrHeader->Header.Part3.Reserved_2Bits = (UCHAR8)Byte;
+      PtrCoding->PtrHeader->Header.Part3.Reserved_2Bits = (uint8_t)Byte;
    }
    else
    {
@@ -300,17 +300,17 @@ void HeaderReadin(StructCodingPara *PtrCoding)
       BitsRead(PtrCoding, &Byte, 1);
       PtrCoding->PtrHeader->Header.Part4.DWTType = (BOOL)Byte;
       BitsRead(PtrCoding, &Byte, 2);
-         PtrCoding->PtrHeader->Header.Part4.Reserved_2Bits = (UCHAR8)Byte;
+         PtrCoding->PtrHeader->Header.Part4.Reserved_2Bits = (uint8_t)Byte;
       BitsRead(PtrCoding, &Byte, 1);
          PtrCoding->PtrHeader->Header.Part4.SignedPixels = (BOOL)Byte;
       BitsRead(PtrCoding, &Byte, 4);
-         PtrCoding->PtrHeader->Header.Part4.PixelBitDepth_4Bits = (UCHAR8)Byte;
+         PtrCoding->PtrHeader->Header.Part4.PixelBitDepth_4Bits = (uint8_t)Byte;
       BitsRead(PtrCoding, &Byte, 20);
-         PtrCoding->PtrHeader->Header.Part4.ImageWidth_20Bits = (DWORD32)Byte;
+         PtrCoding->PtrHeader->Header.Part4.ImageWidth_20Bits = (uint32_t)Byte;
       BitsRead(PtrCoding, &Byte, 1);
          PtrCoding->PtrHeader->Header.Part4.TransposeImg  = (BOOL)Byte;
       BitsRead(PtrCoding, &Byte, 2);
-         PtrCoding->PtrHeader->Header.Part4.CodewordLength_2Bits = (UCHAR8)Byte;
+         PtrCoding->PtrHeader->Header.Part4.CodewordLength_2Bits = (uint8_t)Byte;
 
       if (PtrCoding->PtrHeader->Header.Part4.CodewordLength_2Bits == 00)
          PtrCoding->Bits->CodeWord_Length = 8;
@@ -328,32 +328,32 @@ void HeaderReadin(StructCodingPara *PtrCoding)
       if(Byte == TRUE)
       {
          BitsRead(PtrCoding, &Byte, 2);
-            PtrCoding->PtrHeader->Header.Part4.CustomWtHH1_2bits = (UCHAR8)Byte;
+            PtrCoding->PtrHeader->Header.Part4.CustomWtHH1_2bits = (uint8_t)Byte;
          BitsRead(PtrCoding, &Byte, 2);
-            PtrCoding->PtrHeader->Header.Part4.CustomWtHL1_2bits = (UCHAR8)Byte;
+            PtrCoding->PtrHeader->Header.Part4.CustomWtHL1_2bits = (uint8_t)Byte;
          BitsRead(PtrCoding, &Byte, 2);
-            PtrCoding->PtrHeader->Header.Part4.CustomWtLH1_2bits = (UCHAR8)Byte;
+            PtrCoding->PtrHeader->Header.Part4.CustomWtLH1_2bits = (uint8_t)Byte;
          BitsRead(PtrCoding, &Byte, 2);
-            PtrCoding->PtrHeader->Header.Part4.CustomWtHH2_2bits = (UCHAR8)Byte;
+            PtrCoding->PtrHeader->Header.Part4.CustomWtHH2_2bits = (uint8_t)Byte;
          BitsRead(PtrCoding, &Byte, 2);
-            PtrCoding->PtrHeader->Header.Part4.CustomWtHL2_2bits = (UCHAR8)Byte;
+            PtrCoding->PtrHeader->Header.Part4.CustomWtHL2_2bits = (uint8_t)Byte;
          BitsRead(PtrCoding, &Byte, 2);
-            PtrCoding->PtrHeader->Header.Part4.CustomWtLH2_2bits = (UCHAR8)Byte;
+            PtrCoding->PtrHeader->Header.Part4.CustomWtLH2_2bits = (uint8_t)Byte;
          BitsRead(PtrCoding, &Byte, 2);
-            PtrCoding->PtrHeader->Header.Part4.CustomWtHH3_2bits = (UCHAR8)Byte;
+            PtrCoding->PtrHeader->Header.Part4.CustomWtHH3_2bits = (uint8_t)Byte;
          BitsRead(PtrCoding, &Byte, 2);
-            PtrCoding->PtrHeader->Header.Part4.CustomWtHL3_2bits = (UCHAR8)Byte;
+            PtrCoding->PtrHeader->Header.Part4.CustomWtHL3_2bits = (uint8_t)Byte;
          BitsRead(PtrCoding, &Byte, 2);
-            PtrCoding->PtrHeader->Header.Part4.CustomWtLH3_2bits = (UCHAR8)Byte;
+            PtrCoding->PtrHeader->Header.Part4.CustomWtLH3_2bits = (uint8_t)Byte;
          BitsRead(PtrCoding, &Byte, 2);
-         PtrCoding->PtrHeader->Header.Part4.CustomWtLL3_2bits = (UCHAR8)Byte;
+         PtrCoding->PtrHeader->Header.Part4.CustomWtLL3_2bits = (uint8_t)Byte;
       }
       else
       {
          BitsRead(PtrCoding, &Byte, 20);
       }
       BitsRead(PtrCoding, &Byte, 11);
-      PtrCoding->PtrHeader->Header.Part4.Reserved_11Bits  = (WORD16)Byte;
+      PtrCoding->PtrHeader->Header.Part4.Reserved_11Bits  = (uint16_t)Byte;
    }
 
 

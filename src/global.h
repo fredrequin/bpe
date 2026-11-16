@@ -4,6 +4,7 @@ include this file*/
 #define _GLOBAL_H
 
 #include <stdio.h>
+#include <stdint.h>
 
 //
 // Maximum Supported File path
@@ -22,16 +23,16 @@ include this file*/
 #define NOTRANSPOSE 0
 #define TRANSPOSE 1
 
-typedef unsigned char UCHAR8;
-typedef unsigned int UINT32;
-typedef unsigned long DWORD32;
-typedef unsigned short WORD16;
+//typedef unsigned char uint8_t;
+//typedef unsigned int  uint32_t;
+//typedef unsigned long uint32_t;
+//typedef unsigned short uint16_t;
 typedef unsigned char BOOL;
 
-typedef signed int SINT;
-typedef signed char SCHAR;
-typedef signed long SLONG;
-typedef double DOUBLE4;
+//typedef signed int SINT;
+//typedef signed char int8_t;
+//typedef signed long int32_t;
+//typedef double DOUBLE4;
 
 
 #define ERR_MSG(err) BpeErrorMsg[err]
@@ -89,36 +90,36 @@ typedef double DOUBLE4;
 
 typedef struct BITSTREAM
 {
-   DWORD32 SegBitCounter;
-   DWORD32 TotalBitCounter;
-   UINT32 ByteBuffer_4Bytes;
-   UINT32 CodeWordAlighmentBits;
-   UCHAR8 CodeWord_Length;
+   uint32_t SegBitCounter;
+   uint32_t TotalBitCounter;
+   uint32_t ByteBuffer_4Bytes;
+   uint32_t CodeWordAlighmentBits;
+   uint8_t CodeWord_Length;
    FILE *F_Bits;
 } BitStream;
 
 typedef struct SYMBOLDETAILS
 {
-   UCHAR8 sym_val : 4;
-   UCHAR8 sym_len : 4;
-   UCHAR8 sym_mapped_pattern : 4;
-   UCHAR8 sign : 4;
-   UCHAR8 type : 3;
+   uint8_t sym_val : 4;
+   uint8_t sym_len : 4;
+   uint8_t sym_mapped_pattern : 4;
+   uint8_t sign : 4;
+   uint8_t type : 3;
 }StrSymbolDetails;
 
 typedef struct TYPEC
 {
-   UCHAR8 TypeC: 4;
+   uint8_t TypeC: 4;
 }StrTypeC;
 
 typedef struct TRANH
 {
-   UCHAR8 TranH: 4;
+   uint8_t TranH: 4;
 }StrTranH;
 
 typedef struct TRANHI
 {
-   UCHAR8 TranH: 4;
+   uint8_t TranH: 4;
 }StrTranHI;
 
 typedef struct TYPEHIJ
@@ -128,20 +129,20 @@ typedef struct TYPEHIJ
 
 typedef struct PARENTREFINE
 {
-   UCHAR8 ParentRefSymbol : 4;
-   UCHAR8 ParentSymbolLength: 2;
+   uint8_t ParentRefSymbol : 4;
+   uint8_t ParentSymbolLength: 2;
 }ParentRefine;
 
 typedef struct CHILDRENREF
 {
-   WORD16 ChildrenRefSymbol : 12;
-   UCHAR8 ChildrenSymbolLength: 4;
+   uint16_t ChildrenRefSymbol : 12;
+   uint8_t ChildrenSymbolLength: 4;
 }ChildrenRefine;
 
 typedef struct GRANDCHILDREDREF
 {
-   WORD16 GrandChildrenRefSymbol : 16;
-   UCHAR8 GrandChildrenSymbolLength: 5;
+   uint16_t GrandChildrenRefSymbol : 16;
+   uint8_t GrandChildrenSymbolLength: 5;
 }GrandChildrenRefine;
 
 typedef struct REFINEMENTBIT
@@ -153,11 +154,11 @@ typedef struct REFINEMENTBIT
 
 typedef struct PLANEHIT
 {
-   UCHAR8 TypeP : 3; // i = 0, 1, 2.
-   UCHAR8 TranB : 1; // Ds = 1 or 0.
-   UCHAR8 TranD : 3; // i = 0, 1, 2.
+   uint8_t TypeP : 3; // i = 0, 1, 2.
+   uint8_t TranB : 1; // Ds = 1 or 0.
+   uint8_t TranD : 3; // i = 0, 1, 2.
    StrTypeC TypeCi[3];
-   UCHAR8 TranGi : 3;
+   uint8_t TranGi : 3;
    StrTranH TranHi[3];
    StrTypeHij TypeHij[3];
 }PlaneHit;
@@ -169,15 +170,15 @@ typedef struct BLOCKBITSHIT
    float **PtrBlockAddressFloating;
 
    //Bit plane and block information.
-   UCHAR8 BitPlane : 5;
+   uint8_t BitPlane : 5;
    long BlockIndex : 20;
    // DC and AC_max information
-   DWORD32 MappedDC;
-   DWORD32 ShiftedDC;
-   WORD16 DCRemainder;
+   uint32_t MappedDC;
+   uint32_t ShiftedDC;
+   uint16_t DCRemainder;
    float DecodingDCRemainder;
-   WORD16 BitMaxAC;
-   WORD16 MappedAC;
+   uint16_t BitMaxAC;
+   uint16_t MappedAC;
    // status information ( hit history)
    //bit plane hit information.
    PlaneHit StrPlaneHitHistory;
@@ -194,58 +195,58 @@ typedef struct HEADER_STRUCTURE_PART1
   {
    BOOL StartImgFlag : 1;  // 1 bits
    BOOL EngImgFlg : 1; // 1 bit
-   UCHAR8 SegmentCount_8Bits : 8; //8 bits Senment count/
-   UCHAR8 BitDepthDC_5Bits : 5; // 5 bits
-   UCHAR8 BitDepthAC_5Bits : 5; // 5 bits
+   uint8_t SegmentCount_8Bits : 8; //8 bits Senment count/
+   uint8_t BitDepthDC_5Bits : 5; // 5 bits
+   uint8_t BitDepthAC_5Bits : 5; // 5 bits
    BOOL Reserved : 1; // 1 bits
    BOOL Part2Flag : 1; // 1 bit
    BOOL Part3Flag : 1; // 1 bit
    BOOL Part4Flag : 1; //1 bit
-   UCHAR8 PadRows_3Bits : 3; // 3 bits replicate the last row so that new rows are integal of 8.
-   UCHAR8 Reserved_5Bits : 5; // 5 bits: 00000
+   uint8_t PadRows_3Bits : 3; // 3 bits replicate the last row so that new rows are integal of 8.
+   uint8_t Reserved_5Bits : 5; // 5 bits: 00000
 }HeaderPart1;
 
 typedef struct HEADER_STRUCTURE_PART2
 {
-   DWORD32 SegByteLimit_27Bits : 27; // 27 bits.
+   uint32_t SegByteLimit_27Bits : 27; // 27 bits.
    BOOL DCstop : 1; //indicate whether the compressed output stops.
-   UCHAR8 BitPlaneStop_5Bits : 5; // 5 bits
-   UCHAR8 StageStop_2Bits : 2; // 2 bits, transform input data quantication.
+   uint8_t BitPlaneStop_5Bits : 5; // 5 bits
+   uint8_t StageStop_2Bits : 2; // 2 bits, transform input data quantication.
    BOOL UseFill : 1;
-   UCHAR8 Reserved_4Bits : 4; // 4 bits
+   uint8_t Reserved_4Bits : 4; // 4 bits
 }HeaderPart2;
 
 
 typedef struct HEADER_STRUCTURE_PART3
 {
-   DWORD32 S_20Bits : 20; //max number of blocks in a segment is limited to 2^20
+   uint32_t S_20Bits : 20; //max number of blocks in a segment is limited to 2^20
    BOOL OptDCSelect : 1;
    BOOL OptACSelect : 1;
-   UCHAR8 Reserved_2Bits : 2;
+   uint8_t Reserved_2Bits : 2;
 }HeaderPart3;
 
 typedef struct HEADER_STRUCTURE_PART4
 {
    BOOL DWTType : 1;
-   UCHAR8 Reserved_2Bits : 2; //
+   uint8_t Reserved_2Bits : 2; //
    BOOL SignedPixels : 1;
-   UCHAR8 PixelBitDepth_4Bits : 4;
-   DWORD32 ImageWidth_20Bits : 20; // maximum image width is limited 2^20
+   uint8_t PixelBitDepth_4Bits : 4;
+   uint32_t ImageWidth_20Bits : 20; // maximum image width is limited 2^20
    BOOL TransposeImg : 1;
-   UCHAR8 CodewordLength_2Bits : 2;
+   uint8_t CodewordLength_2Bits : 2;
    BOOL Reserved : 1;
    BOOL CustomWtFlag : 1;
-   UCHAR8 CustomWtHH1_2bits : 2;
-   UCHAR8 CustomWtHL1_2bits : 2;
-   UCHAR8 CustomWtLH1_2bits : 2;
-   UCHAR8 CustomWtHH2_2bits : 2;
-   UCHAR8 CustomWtHL2_2bits : 2;
-   UCHAR8 CustomWtLH2_2bits : 2;
-   UCHAR8 CustomWtHH3_2bits : 2;
-   UCHAR8 CustomWtHL3_2bits : 2;
-   UCHAR8 CustomWtLH3_2bits : 2;
-   UCHAR8 CustomWtLL3_2bits : 2;
-   WORD16 Reserved_11Bits : 11;
+   uint8_t CustomWtHH1_2bits : 2;
+   uint8_t CustomWtHL1_2bits : 2;
+   uint8_t CustomWtLH1_2bits : 2;
+   uint8_t CustomWtHH2_2bits : 2;
+   uint8_t CustomWtHL2_2bits : 2;
+   uint8_t CustomWtLH2_2bits : 2;
+   uint8_t CustomWtHH3_2bits : 2;
+   uint8_t CustomWtHL3_2bits : 2;
+   uint8_t CustomWtLH3_2bits : 2;
+   uint8_t CustomWtLL3_2bits : 2;
+   uint16_t Reserved_11Bits : 11;
 }HeaderPart4;
 
 typedef struct HEADER
@@ -276,21 +277,21 @@ typedef struct STR_STOPLOCATION {
 typedef struct CODINGPARAMETERS
 {
    BitStream *Bits;
-   UCHAR8 BitPlane;
+   uint8_t BitPlane;
    float BitsPerPixel;      // default coding BitsPerPixel, bits per pixels
-   DWORD32 DecodingAllowedBitsSizeInSegment;      // for decoding purpose.
+   uint32_t DecodingAllowedBitsSizeInSegment;      // for decoding purpose.
    BOOL RateReached;
    StrStopLocation DecodingStopLocations;
-   UCHAR8 QuantizationFactorQ:6;
-   UINT32 BlockCounter;
-   UINT32 block_index;
-   UCHAR8 N;
+   uint8_t QuantizationFactorQ:6;
+   uint32_t BlockCounter;
+   uint32_t block_index;
+   uint8_t N;
    BOOL SegmentFull;
    HeaderStruct * PtrHeader;
-   UINT32 ImageRows;
-   UINT32 ImageWidth;
-   UCHAR8 PadCols_3Bits;
-   UCHAR8 PixelByteOrder:1; // default byte order. 1 means LSB first.
+   uint32_t ImageRows;
+   uint32_t ImageWidth;
+   uint8_t PadCols_3Bits;
+   uint8_t PixelByteOrder:1; // default byte order. 1 means LSB first.
    char InputFile[MAX_FILE_NAME_SIZE];
    char CodingOutputFile[MAX_FILE_NAME_SIZE];
    BOOL altStrageStop; // Alternative stage stop
@@ -300,7 +301,7 @@ typedef struct BLOCKSTRING
 {
    long **FreqBlkString;
    float ** FloatingFreqBlk;
-   UINT32 Blocks;
+   uint32_t Blocks;
    struct BLOCKSTRING *next;
    struct BLOCKSTRING *previous;
 }StructFreBlockString;
@@ -308,8 +309,8 @@ typedef struct BLOCKSTRING
 
 
 void ErrorMsg(int err);
-void BitsOutput(StructCodingPara *,    DWORD32 ,  int );
-short BitsRead(StructCodingPara *,   DWORD32 *,  short );
+void BitsOutput(StructCodingPara *,    uint32_t ,  int );
+short BitsRead(StructCodingPara *,   uint32_t *,  short );
 
 //FILE *F_CodingInfo;
 #endif

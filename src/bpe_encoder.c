@@ -70,7 +70,7 @@ Return values:
 
    struct stat status;
    int res;
-   UINT32 img_len;
+   uint32_t img_len;
    char buffer[BUFFER_LENGTH];
 
 
@@ -169,10 +169,10 @@ Return values:
 short ImageRead(StructCodingPara *StrPtr,
             int **image)
 {
-   UINT32 r = 0;
-   UINT32 i = 0;
+   uint32_t r = 0;
+   uint32_t i = 0;
    FILE *infile = NULL;
-   UCHAR8 machineendianness;  // indicates endian-ness of the computer -- bug fix (Kiely)
+   uint8_t machineendianness;  // indicates endian-ness of the computer -- bug fix (Kiely)
    unsigned long int bigendtest = 1;  //  bug fix (Kiely)
 
    infile = fopen(StrPtr->InputFile,"rb");
@@ -187,8 +187,8 @@ short ImageRead(StructCodingPara *StrPtr,
    {
       if(StrPtr->PtrHeader->Header.Part4.SignedPixels == FALSE) // unsigned image
       {
-         UCHAR8 *temp;
-         temp = (UCHAR8 *)calloc(sizeof(UCHAR8), StrPtr->ImageWidth);
+         uint8_t *temp;
+         temp = (uint8_t *)calloc(sizeof(uint8_t), StrPtr->ImageWidth);
          for(r = 0; r < StrPtr->ImageRows;  r++)
          {
             fread(temp, StrPtr->ImageWidth, sizeof(char),infile);
@@ -215,8 +215,8 @@ short ImageRead(StructCodingPara *StrPtr,
    {
       if(StrPtr->PtrHeader->Header.Part4.SignedPixels == FALSE) // unsigned image
       {
-         WORD16 *temp_16;
-         temp_16 = (WORD16 *)calloc(sizeof(WORD16), StrPtr->ImageWidth);
+         uint16_t *temp_16;
+         temp_16 = (uint16_t *)calloc(sizeof(uint16_t), StrPtr->ImageWidth);
          for(r=0; r<StrPtr->ImageRows; r++)
          {
             fread(temp_16, StrPtr->ImageWidth, sizeof(short),infile);
@@ -309,7 +309,7 @@ void BuildBlockString(int **TransformedImage,
    int BlockRow = 0;
    int BlockCol = 0;
    int counter = 0;
-   UINT32 TotalBlocks = 0;
+   uint32_t TotalBlocks = 0;
 
    BlockRow = ImageRows / BLOCK_SIZE;
    BlockCol = ImageWidth / BLOCK_SIZE;
@@ -338,10 +338,10 @@ void EncoderEngine(StructCodingPara * PtrCoding)
    int  **OriginalImage = NULL;
    int **TransformedImage = NULL;
    long **BlockString = NULL;
-   UINT32 TotalBlocks = 0;
-   UINT32 i = 0;
-   UINT32 j = 0;
-   UCHAR8 TempPaddedRows = 0;
+   uint32_t TotalBlocks = 0;
+   uint32_t i = 0;
+   uint32_t j = 0;
+   uint8_t TempPaddedRows = 0;
 
    BitPlaneBits *BlockCodingInfo;
    // check to see if the file size are correct or not.

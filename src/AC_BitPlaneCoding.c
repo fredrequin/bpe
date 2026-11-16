@@ -41,11 +41,11 @@ void ACGaggleEncoding(StructCodingPara *PtrCoding,
    int k = 0;
    int min_k = 0;
 
-   DWORD32 min_bits = 0xFFFF;
-   DWORD32 total_bits = 0;
+   uint32_t min_bits = 0xFFFF;
+   uint32_t total_bits = 0;
 
    /* --- Begin bug fix (Kiely) --- */
-   UCHAR8 uncoded_flag = ~0;   // this is the flag indicating that uncoded option used
+   uint8_t uncoded_flag = ~0;   // this is the flag indicating that uncoded option used
 
    // determine code choice min_k to use, either via brute-force optimum calculation, or heuristic approach
    // nkeffix : typo, it should be OptACSelect see 122x0b1c3 section 4.2.4.1.2
@@ -153,10 +153,10 @@ void DPCM_ACMapper(BitPlaneBits *BlockInfo,
 void ACDepthEncoder(StructCodingPara *PtrCoding,
                BitPlaneBits *BlockInfo)
 {
-   SINT GaggleStartIndex;
-   UCHAR8 Max_k;
-   UCHAR8 ID_Length;
-   UCHAR8 gaggles ; // initial value is 15.
+   int GaggleStartIndex;
+   int Max_k;
+   uint8_t ID_Length;
+   uint8_t gaggles ; // initial value is 15.
 
    PtrCoding->N = 0;
    while( PtrCoding->PtrHeader->Header.Part1.BitDepthAC_5Bits>>PtrCoding->N > 0)
@@ -201,8 +201,8 @@ void ACDepthEncoder(StructCodingPara *PtrCoding,
 
 void ACBpeEncoding(StructCodingPara *PtrCoding,    BitPlaneBits *BlockInfo)
 {
-   DWORD32 i = 0;
-   UCHAR8 BitPlane = 0;
+   uint32_t i = 0;
+   uint8_t BitPlane = 0;
 
 ////////////////////////////////////////////////////////////////////////////////////////
    // The link nodes PlaneSym are used to coding of the bit planes. Contains a
@@ -279,7 +279,7 @@ void CheckUsefill(StructCodingPara * PtrCoding)
          PtrCoding->Bits->SegBitCounter)
       {
          int RemainderBits = 0;
-         DWORD32 TempWord = 0;
+         uint32_t TempWord = 0;
          RemainderBits = PtrCoding->Bits->SegBitCounter
             - (PtrCoding->PtrHeader->Header.Part2.SegByteLimit_27Bits <<3);
 
@@ -304,10 +304,10 @@ void ACGaggleDecoding(StructCodingPara *PtrCoding,
                      short ID_Length)
 {
    long int i;
-   UCHAR8 min_k;
-   DWORD32 TempWord =0;
+   uint8_t min_k;
+   uint32_t TempWord =0;
    int counter = 0;
-   UCHAR8 ones = ~0;
+   uint8_t ones = ~0;
    BOOL uncoded = FALSE;
 
    // makes the least ID_Length bits to ones.
@@ -315,7 +315,7 @@ void ACGaggleDecoding(StructCodingPara *PtrCoding,
 
    BitsRead(PtrCoding, &TempWord, ID_Length);
 
-   min_k = (UCHAR8) TempWord;
+   min_k = (uint8_t) TempWord;
 
    if((ID_Length == 1 && min_k == 1) || (ID_Length == 2 && min_k == 3) ||
       (ID_Length == 3 && min_k == 7) || (ID_Length == 4 && min_k == 15))
@@ -325,7 +325,7 @@ void ACGaggleDecoding(StructCodingPara *PtrCoding,
    for( i = StartIndex; i < StartIndex + gaggles; i ++){
        if ((uncoded == TRUE)||(i==0)){  // if first value in segment, then it's an uncoded reference
          BitsRead(PtrCoding, &TempWord, PtrCoding->N);
-         BlockInfo[i].MappedAC = (WORD16) TempWord;
+         BlockInfo[i].MappedAC = (uint16_t) TempWord;
          if(PtrCoding->RateReached == TRUE)
             return;
       } else {
@@ -350,7 +350,7 @@ void ACGaggleDecoding(StructCodingPara *PtrCoding,
       // i==0 indicates a reference sample, which was already decoded above
       for( i = max(StartIndex,1); i < StartIndex + gaggles; i ++){
          BitsRead(PtrCoding, &TempWord, min_k);
-         BlockInfo[i].MappedAC += (WORD16)TempWord;
+         BlockInfo[i].MappedAC += (uint16_t)TempWord;
          if (PtrCoding->RateReached == TRUE)
             break;
       }
@@ -364,7 +364,7 @@ void ACGaggleDecoding(StructCodingPara *PtrCoding,
 
 
 
-void DPCM_ACDeMapper(BitPlaneBits *BlockCodingInfo, //UCHAR8 *ACmax_blocks,
+void DPCM_ACDeMapper(BitPlaneBits *BlockCodingInfo, //uint8_t *ACmax_blocks,
                 int size,
                 short N)
 {
@@ -376,7 +376,7 @@ void DPCM_ACDeMapper(BitPlaneBits *BlockCodingInfo, //UCHAR8 *ACmax_blocks,
 
    diff_AC = (short *)calloc(size,sizeof(short));
 
-   BlockCodingInfo[0].BitMaxAC = (UCHAR8)BlockCodingInfo[0].MappedAC;
+   BlockCodingInfo[0].BitMaxAC = (uint8_t)BlockCodingInfo[0].MappedAC;
 
    for ( i = 1; i < size; i ++)
    {
@@ -418,10 +418,10 @@ void DPCM_ACDeMapper(BitPlaneBits *BlockCodingInfo, //UCHAR8 *ACmax_blocks,
 short ACDepthDecoder(StructCodingPara *PtrCoding,
                 BitPlaneBits *BlockInfo)
 {
-   SINT Max_k = 0;
-   UINT32 GaggleStartIndex = 0;
-   UCHAR8 ID_Length = 0;
-   WORD16 gaggles = 0;
+   int Max_k = 0;
+   int GaggleStartIndex = 0;
+   uint8_t ID_Length = 0;
+   uint16_t gaggles = 0;
 
    PtrCoding->N = 0;
    while( PtrCoding->PtrHeader->Header.Part1.BitDepthAC_5Bits >> PtrCoding->N > 0)
@@ -460,9 +460,9 @@ short ACDepthDecoder(StructCodingPara *PtrCoding,
 void  ACBpeDecoding(StructCodingPara *PtrCoding,
                 BitPlaneBits *BlockCodingInfo)
 {
-   UINT32 i = 0;
-   DWORD32 TempWord = 0;
-   UCHAR8 BitPlane = 0;
+   uint32_t i = 0;
+   uint32_t TempWord = 0;
+   uint8_t BitPlane = 0;
 
    ///////////  3. Organize the AC component/////////////////////////////
    // 3.1 Specify the number of bit planes in each block.
@@ -472,11 +472,11 @@ void  ACBpeDecoding(StructCodingPara *PtrCoding,
    {
       if (PtrCoding->PtrHeader->Header.Part1.BitDepthAC_5Bits == 1)
       { //only the lowest bit plane has valud AC component manitude.
-         DWORD32 TempWord;
+         uint32_t TempWord;
          for ( i = 0; i < PtrCoding->PtrHeader->Header.Part3.S_20Bits; i++)
          {
             BitsRead(PtrCoding, &TempWord, 1);
-            BlockCodingInfo[i].BitMaxAC = (UCHAR8)TempWord;
+            BlockCodingInfo[i].BitMaxAC = (uint8_t)TempWord;
          }
       }
       else
@@ -513,7 +513,7 @@ void  ACBpeDecoding(StructCodingPara *PtrCoding,
             if(PtrCoding->SegmentFull == TRUE)
                break;
             BitsRead(PtrCoding, &TempWord, 1);
-            BlockCodingInfo[i].DecodingDCRemainder += (WORD16)(TempWord << (BitPlane - 1)) ;
+            BlockCodingInfo[i].DecodingDCRemainder += (uint16_t)(TempWord << (BitPlane - 1)) ;
          }
       }
 

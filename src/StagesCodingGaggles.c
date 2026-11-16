@@ -21,19 +21,19 @@ Nov. 3, 2006
 
 extern void RiceCoding(short InputVal,
               short BitLength,
-              UCHAR8 *Option,
+              uint8_t *Option,
               StructCodingPara *PtrCoding );
 
 extern void BitPlaneSymbolReset(StrSymbolDetails *SymbolStr);
 
 void StagesEnCodingGaggles1(StructCodingPara *PtrCoding,
                          BitPlaneBits *BlockInfo,
-                         UCHAR8 BlocksInGaggles,
-                         UCHAR8 Option[],
+                         uint8_t BlocksInGaggles,
+                         uint8_t Option[],
                          BOOL FlagCodeOptionOutput[]  )
 {
-   UCHAR8 SymbolIndex = 0;
-   DWORD32 BlockSeq = 0;
+   uint8_t SymbolIndex = 0;
+   uint32_t BlockSeq = 0;
    short i;
    short counter= 0;
 
@@ -100,12 +100,12 @@ void StagesEnCodingGaggles1(StructCodingPara *PtrCoding,
 
 void StagesEnCodingGaggles2(StructCodingPara *PtrCoding,
                          BitPlaneBits *BlockInfo,
-                         UCHAR8 BlocksInGaggles,
-                         UCHAR8 Option[],
+                         uint8_t BlocksInGaggles,
+                         uint8_t Option[],
                          BOOL FlagCodeOptionOutput[])
 {
-   UCHAR8 SymbolIndex = 0;
-   DWORD32 BlockSeq = 0;
+   uint8_t SymbolIndex = 0;
+   uint32_t BlockSeq = 0;
    short i;
    short counter= 0;
 
@@ -160,12 +160,12 @@ void StagesEnCodingGaggles2(StructCodingPara *PtrCoding,
 
 void StagesEnCodingGaggles3(StructCodingPara *PtrCoding,
                          BitPlaneBits *BlockInfo,
-                         UCHAR8 BlocksInGaggles,
-                         UCHAR8 Option[],
+                         uint8_t BlocksInGaggles,
+                         uint8_t Option[],
                          BOOL FlagCodeOptionOutput[])
 {
-   UCHAR8 SymbolIndex = 0;
-   DWORD32 BlockSeq = 0;
+   uint8_t SymbolIndex = 0;
+   uint32_t BlockSeq = 0;
    short i;
    short counter= 0;
 
@@ -218,26 +218,26 @@ void StagesEnCodingGaggles3(StructCodingPara *PtrCoding,
    }
 }
 
-extern void RiceDecoding(DWORD32 *decoded,
+extern void RiceDecoding(uint32_t *decoded,
             short BitLength,
-            UCHAR8 *splitOption,
+            uint8_t *splitOption,
             StructCodingPara *Ptr);
 
 extern void DeMappingPattern(StrSymbolDetails *StrSymbol);
 
 void StagesDeCodingGaggles1(StructCodingPara *PtrCoding,
                      BitPlaneBits *BlockCodingInfo,
-                     UCHAR8 BlocksInGaggles,
-                     UCHAR8 *CodeOptionsAllGaggles,
+                     uint8_t BlocksInGaggles,
+                     uint8_t *CodeOptionsAllGaggles,
                      BOOL *FlagCodeOptionOutput)
 {
-   UCHAR8 temp_x;
-   UCHAR8 temp_y;
-   UCHAR8 counter;
-   UCHAR8 BlockSeq;
-   UCHAR8 RefCounter = 0;
+   uint8_t temp_x;
+   uint8_t temp_y;
+   uint8_t counter;
+   uint8_t BlockSeq;
+   uint8_t RefCounter = 0;
    int i;
-   UCHAR8 BitPlane = PtrCoding->BitPlane;
+   uint8_t BitPlane = PtrCoding->BitPlane;
    StrSymbolDetails StrSymbol;
 
    for ( BlockSeq = 0; BlockSeq < BlocksInGaggles; BlockSeq ++)
@@ -265,7 +265,7 @@ void StagesDeCodingGaggles1(StructCodingPara *PtrCoding,
       {
          if(counter != 0)
          {
-            DWORD32 temp_DWORD;
+            uint32_t temp_DWORD;
             if(counter != 1)
             {
                if(FlagCodeOptionOutput[counter - 2] == FALSE)
@@ -279,7 +279,7 @@ void StagesDeCodingGaggles1(StructCodingPara *PtrCoding,
                   {
                      BitsRead(PtrCoding, &temp_DWORD, 2);
                   }
-                  CodeOptionsAllGaggles[counter - 2] = (UCHAR8) temp_DWORD;
+                  CodeOptionsAllGaggles[counter - 2] = (uint8_t) temp_DWORD;
 
                   if ((PtrCoding->DecodingStopLocations.BitPlaneStopDecoding != -1)
                      && PtrCoding->RateReached == TRUE && !PtrCoding->DecodingStopLocations.LocationFind)
@@ -304,7 +304,7 @@ void StagesDeCodingGaggles1(StructCodingPara *PtrCoding,
                PtrCoding->DecodingStopLocations.LocationFind = TRUE;
                return;
             }
-            StrSymbol.sym_mapped_pattern= (UCHAR8)temp_DWORD;
+            StrSymbol.sym_mapped_pattern= (uint8_t)temp_DWORD;
             StrSymbol.sym_len = counter;
             StrSymbol.type = ENUM_TYPE_P;
             DeMappingPattern(&StrSymbol);
@@ -394,19 +394,19 @@ void StagesDeCodingGaggles1(StructCodingPara *PtrCoding,
 
 void StagesDeCodingGaggles2(StructCodingPara *PtrCoding,
                      BitPlaneBits *BlockCodingInfo,
-                     UCHAR8 BlocksInGaggles,
-                     UCHAR8 *CodeOptionsAllGaggles,
+                     uint8_t BlocksInGaggles,
+                     uint8_t *CodeOptionsAllGaggles,
                      BOOL *FlagCodeOptionOutput)
 {
-   UCHAR8 temp_x;
-   UCHAR8 temp_y;
-   UCHAR8 counter;
-   UCHAR8 BlockSeq;
+   uint8_t temp_x;
+   uint8_t temp_y;
+   uint8_t counter;
+   uint8_t BlockSeq;
    int i;
    int k;
    int p;
-   DWORD32 temp_DWORD;
-   UCHAR8 BitPlane = PtrCoding->BitPlane;
+   uint32_t temp_DWORD;
+   uint8_t BitPlane = PtrCoding->BitPlane;
    StrSymbolDetails StrSymbol;
    BOOL Flag;
 
@@ -455,9 +455,9 @@ void StagesDeCodingGaggles2(StructCodingPara *PtrCoding,
 
       if (BlockCodingInfo[BlockSeq].StrPlaneHitHistory.TranB != 1)
       {
-         DWORD32 Temp_Word;
+         uint32_t Temp_Word;
          BitsRead(PtrCoding, &Temp_Word, 1);
-         BlockCodingInfo[BlockSeq].StrPlaneHitHistory.TranB = (UCHAR8)Temp_Word;
+         BlockCodingInfo[BlockSeq].StrPlaneHitHistory.TranB = (uint8_t)Temp_Word;
 
          if ((PtrCoding->DecodingStopLocations.BitPlaneStopDecoding != -1)
             && PtrCoding->RateReached == TRUE && !PtrCoding->DecodingStopLocations.LocationFind)
@@ -475,7 +475,7 @@ void StagesDeCodingGaggles2(StructCodingPara *PtrCoding,
 
       if(counter != 0)
       {
-         DWORD32 TempWord;
+         uint32_t TempWord;
 
          if(counter != 1)
          {
@@ -490,7 +490,7 @@ void StagesDeCodingGaggles2(StructCodingPara *PtrCoding,
                {
                   BitsRead(PtrCoding, &TempWord, 2);
                }
-               CodeOptionsAllGaggles[counter - 2] = (UCHAR8) TempWord;
+               CodeOptionsAllGaggles[counter - 2] = (uint8_t) TempWord;
 
                if ((PtrCoding->DecodingStopLocations.BitPlaneStopDecoding != -1)
                   && PtrCoding->RateReached == TRUE && !PtrCoding->DecodingStopLocations.LocationFind)
@@ -543,7 +543,7 @@ void StagesDeCodingGaggles2(StructCodingPara *PtrCoding,
             PtrCoding->DecodingStopLocations.LocationFind = TRUE;
             return;
          }
-         StrSymbol.sym_mapped_pattern = (UCHAR8) TempWord;
+         StrSymbol.sym_mapped_pattern = (uint8_t) TempWord;
          StrSymbol.sym_len = counter;
          StrSymbol.type = ENUM_TRAN_D;
          DeMappingPattern(&StrSymbol);
@@ -590,7 +590,7 @@ void StagesDeCodingGaggles2(StructCodingPara *PtrCoding,
             }
             if(counter != 0)
             {
-               DWORD32 TempWord;
+               uint32_t TempWord;
                short t = 0;
                if(counter != 1)
                {
@@ -605,7 +605,7 @@ void StagesDeCodingGaggles2(StructCodingPara *PtrCoding,
                      {
                         BitsRead(PtrCoding, &TempWord, 2);
                      }
-                     CodeOptionsAllGaggles[counter - 2] = (UCHAR8) TempWord;
+                     CodeOptionsAllGaggles[counter - 2] = (uint8_t) TempWord;
 
                      if ((PtrCoding->DecodingStopLocations.BitPlaneStopDecoding != -1)
                            && PtrCoding->RateReached == TRUE && !PtrCoding->DecodingStopLocations.LocationFind)
@@ -658,7 +658,7 @@ void StagesDeCodingGaggles2(StructCodingPara *PtrCoding,
                      return;
                }
 
-               StrSymbol.sym_mapped_pattern =  (UCHAR8)TempWord;
+               StrSymbol.sym_mapped_pattern =  (uint8_t)TempWord;
                StrSymbol.sym_len = counter;
                StrSymbol.type = ENUM_TYPE_CI;
                DeMappingPattern(&StrSymbol);
@@ -675,7 +675,7 @@ void StagesDeCodingGaggles2(StructCodingPara *PtrCoding,
                         temp_DWORD = ((StrSymbol.sym_val >> (counter - 1)) & 0x01);
                         if(temp_DWORD > 0)
                         {
-                           DWORD32 TempWord;
+                           uint32_t TempWord;
                            BlockCodingInfo[BlockSeq].StrPlaneHitHistory.TypeCi[k].TypeC += (1 << (3 - t));
                            BlockCodingInfo[BlockSeq].PtrBlockAddress[i][p] += (1 << (BitPlane - 1));
                            BitsRead(PtrCoding, &TempWord, 1); // sign bit
@@ -725,20 +725,20 @@ void StagesDeCodingGaggles2(StructCodingPara *PtrCoding,
 
 void StagesDeCodingGaggles3(StructCodingPara *PtrCoding,
                      BitPlaneBits *BlockCodingInfo,
-                     UCHAR8 BlocksInGaggles,
-                     UCHAR8 *CodeOptionsAllGaggles,
+                     uint8_t BlocksInGaggles,
+                     uint8_t *CodeOptionsAllGaggles,
                      BOOL *FlagCodeOptionOutput)
 {
-   UCHAR8 temp_x;
-   UCHAR8 temp_y;
-   UCHAR8 counter;
-   UINT32 BlockSeq;
+   uint8_t temp_x;
+   uint8_t temp_y;
+   uint8_t counter;
+   uint32_t BlockSeq;
    int i;
    int k;
    int p;
-   DWORD32 temp_DWORD;
+   uint32_t temp_DWORD;
    BOOL flag = FALSE;
-   UCHAR8 BitPlane = PtrCoding->BitPlane;
+   uint8_t BitPlane = PtrCoding->BitPlane;
    StrSymbolDetails StrSymbol;
 
    // nkeffix : Implement StageStop in 122x0b1c3 section 4.2.3.1 Table 4-5
@@ -793,7 +793,7 @@ void StagesDeCodingGaggles3(StructCodingPara *PtrCoding,
 
       if(counter > 0)
       {
-         DWORD32 TempWord;
+         uint32_t TempWord;
 
          if(counter != 1)
          {
@@ -808,7 +808,7 @@ void StagesDeCodingGaggles3(StructCodingPara *PtrCoding,
                {
                   BitsRead(PtrCoding, &TempWord, 2);
                }
-               CodeOptionsAllGaggles[counter - 2] = (UCHAR8) TempWord;
+               CodeOptionsAllGaggles[counter - 2] = (uint8_t) TempWord;
 
                if ((PtrCoding->DecodingStopLocations.BitPlaneStopDecoding != -1)
                   && PtrCoding->RateReached == TRUE && !PtrCoding->DecodingStopLocations.LocationFind)
@@ -861,7 +861,7 @@ void StagesDeCodingGaggles3(StructCodingPara *PtrCoding,
                      PtrCoding->DecodingStopLocations.LocationFind = TRUE;
                      return;
                }
-         StrSymbol.sym_mapped_pattern = (UCHAR8)TempWord;
+         StrSymbol.sym_mapped_pattern = (uint8_t)TempWord;
          StrSymbol.sym_len = counter;
          StrSymbol.type = ENUM_TRAN_GI;
          DeMappingPattern(&StrSymbol);
@@ -899,7 +899,7 @@ void StagesDeCodingGaggles3(StructCodingPara *PtrCoding,
 
          if((BlockCodingInfo[BlockSeq].StrPlaneHitHistory.TranGi & ( 1 << (2 - k))) != 0)
          {
-            DWORD32 TempWord;
+            uint32_t TempWord;
             counter = 0;
             for (i = 0; i < 4; i ++)
             {
@@ -922,7 +922,7 @@ void StagesDeCodingGaggles3(StructCodingPara *PtrCoding,
                   {
                      BitsRead(PtrCoding, &TempWord, 2);
                   }
-                  CodeOptionsAllGaggles[counter - 2] = (UCHAR8) TempWord;
+                  CodeOptionsAllGaggles[counter - 2] = (uint8_t) TempWord;
 
                   if ((PtrCoding->DecodingStopLocations.BitPlaneStopDecoding != -1)
                      && PtrCoding->RateReached == TRUE && !PtrCoding->DecodingStopLocations.LocationFind)
@@ -977,7 +977,7 @@ void StagesDeCodingGaggles3(StructCodingPara *PtrCoding,
                      return;
                }
 
-            StrSymbol.sym_mapped_pattern = (UCHAR8) TempWord;
+            StrSymbol.sym_mapped_pattern = (uint8_t) TempWord;
             StrSymbol.sym_len = counter;
             StrSymbol.type = ENUM_TRAN_HI;
             DeMappingPattern(&StrSymbol);
@@ -1026,7 +1026,7 @@ void StagesDeCodingGaggles3(StructCodingPara *PtrCoding,
 
             if((BlockCodingInfo[BlockSeq].StrPlaneHitHistory.TranHi[i].TranH & ( 1 << ( 3 - k))) > 0)
             {
-               DWORD32 TempWord;
+               uint32_t TempWord;
                counter = 0;
                for (p = 0; p < 4; p++)
                {
@@ -1044,7 +1044,7 @@ void StagesDeCodingGaggles3(StructCodingPara *PtrCoding,
                            BitsRead(PtrCoding, &TempWord, 1);
                         else
                            BitsRead(PtrCoding, &TempWord, 2);
-                        CodeOptionsAllGaggles[counter - 2] = (UCHAR8) TempWord;
+                        CodeOptionsAllGaggles[counter - 2] = (uint8_t) TempWord;
 
                         if ((PtrCoding->DecodingStopLocations.BitPlaneStopDecoding != -1)
                            && PtrCoding->RateReached == TRUE && !PtrCoding->DecodingStopLocations.LocationFind)
@@ -1070,8 +1070,8 @@ void StagesDeCodingGaggles3(StructCodingPara *PtrCoding,
                      return;
                   }
 
-                  StrSymbol.sym_mapped_pattern = (UCHAR8) TempWord;
-                  StrSymbol.sym_len = (UCHAR8) counter;
+                  StrSymbol.sym_mapped_pattern = (uint8_t) TempWord;
+                  StrSymbol.sym_len = (uint8_t) counter;
                   StrSymbol.type = ENUM_TYPE_HIJ;
                   DeMappingPattern(&StrSymbol);
 
@@ -1088,7 +1088,7 @@ void StagesDeCodingGaggles3(StructCodingPara *PtrCoding,
                      counter --;
                      if(temp_DWORD > 0)
                      {
-                        DWORD32 TempWord;
+                        uint32_t TempWord;
                         BlockCodingInfo[BlockSeq].PtrBlockAddress[temp_x + p / 2][temp_y + p % 2] += (1 << (BitPlane - 1));
                         BlockCodingInfo[BlockSeq].StrPlaneHitHistory.TypeHij[i].TypeHij[k].TranH += (1 << ( 3 - p));
                         BitsRead(PtrCoding, &TempWord, 1); // sign bit

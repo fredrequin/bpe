@@ -22,7 +22,7 @@ Nov. 3, 2006
 
 void RiceCoding(short InputVal,
               short BitLength,
-              UCHAR8 *Option,
+              uint8_t *Option,
               StructCodingPara *PtrCoding )
 {
    switch(BitLength)
@@ -189,13 +189,13 @@ void RiceCoding(short InputVal,
 }
 
 
-void RiceDecoding(DWORD32 *decoded,
+void RiceDecoding(uint32_t *decoded,
             short BitLength,
-            UCHAR8 *splitOption,
+            uint8_t *splitOption,
             StructCodingPara *Ptr)
 {
-   DWORD32 WordReadin = 0;
-   DWORD32 i = 0;
+   uint32_t WordReadin = 0;
+   uint32_t i = 0;
 
    switch(BitLength)
    {

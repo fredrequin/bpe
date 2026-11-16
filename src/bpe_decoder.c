@@ -46,10 +46,10 @@ short ImageWrite(StructCodingPara *StrPtr, int **image);
 
 short ImageWrite(StructCodingPara *StrPtr,  int **image)
 {
-   UINT32 r = 0;
-   UINT32 i = 0;
+   uint32_t r = 0;
+   uint32_t i = 0;
    FILE *outfile = NULL;
-   UCHAR8 machineendianness;  // indicates endian-ness of the computer -- bug fix (Kiely)
+   uint8_t machineendianness;  // indicates endian-ness of the computer -- bug fix (Kiely)
    unsigned long int bigendtest = 1;  //  bug fix (Kiely)
 
    if((outfile = fopen(StrPtr->CodingOutputFile,"wb")) == NULL)
@@ -62,8 +62,8 @@ short ImageWrite(StructCodingPara *StrPtr,  int **image)
    {
       if(StrPtr->PtrHeader->Header.Part4.SignedPixels == FALSE) // unsigned image
       {
-         UCHAR8 *temp;
-         temp = (UCHAR8 *)calloc(sizeof(UCHAR8), StrPtr->ImageWidth);
+         uint8_t *temp;
+         temp = (uint8_t *)calloc(sizeof(uint8_t), StrPtr->ImageWidth);
 
          for(r = 0; r< StrPtr->ImageRows; r++)
          {
@@ -71,7 +71,7 @@ short ImageWrite(StructCodingPara *StrPtr,  int **image)
             {
                image[r][i] = (image[r][i] > 0xFF)?0xFF :image[r][i] ;
                image[r][i] = (image[r][i] < 0)?0 :image[r][i] ;
-               temp[i] = (UCHAR8)image[r][i];
+               temp[i] = (uint8_t)image[r][i];
             }
             fwrite(temp, StrPtr->ImageWidth, sizeof(char),outfile);
          }
@@ -104,9 +104,9 @@ short ImageWrite(StructCodingPara *StrPtr,  int **image)
 
       if(StrPtr->PtrHeader->Header.Part4.SignedPixels == FALSE) // unsigned image
       {
-         WORD16 *temp_16;
+         uint16_t *temp_16;
 
-         WORD16 PixelMax;
+         uint16_t PixelMax;
 
          if (StrPtr->PtrHeader->Header.Part4.PixelBitDepth_4Bits == 0)
             PixelMax = (1 << 16) - 1;
@@ -114,7 +114,7 @@ short ImageWrite(StructCodingPara *StrPtr,  int **image)
             PixelMax = (1 << StrPtr->PtrHeader->Header.Part4.PixelBitDepth_4Bits) - 1;
 
 
-         temp_16 = (WORD16 *)calloc(sizeof(WORD16), StrPtr->ImageWidth);
+         temp_16 = (uint16_t *)calloc(sizeof(uint16_t), StrPtr->ImageWidth);
 
          // if(StrPtr->PixelByteOrder == 1)
          if ( StrPtr->PixelByteOrder != machineendianness)  //  bug fix (Kiely)
@@ -125,9 +125,9 @@ short ImageWrite(StructCodingPara *StrPtr,  int **image)
                   image[r][i] = (image[r][i] > PixelMax) ? PixelMax : image[r][i];
                   image[r][i] = (image[r][i] < 0) ? 0 : image[r][i];
                   image[r][i] = ((image[r][i] << 8) & MSBmask) + (image[r][i] >> 8) ;  //  bug fix (Kiely)
-                  temp_16[i] =(WORD16)image[r][i] ;
+                  temp_16[i] =(uint16_t)image[r][i] ;
                }
-               fwrite(temp_16, StrPtr->ImageWidth, sizeof(WORD16), outfile);
+               fwrite(temp_16, StrPtr->ImageWidth, sizeof(uint16_t), outfile);
             }
          else
          {
@@ -137,9 +137,9 @@ short ImageWrite(StructCodingPara *StrPtr,  int **image)
                {
                   image[r][i] = (image[r][i] > PixelMax) ? PixelMax : image[r][i];
                   image[r][i] = (image[r][i] < 0) ? 0 : image[r][i];
-                  temp_16[i] = (WORD16)image[r][i] ;
+                  temp_16[i] = (uint16_t)image[r][i] ;
                }
-               fwrite(temp_16, StrPtr->ImageWidth, sizeof(WORD16), outfile);
+               fwrite(temp_16, StrPtr->ImageWidth, sizeof(uint16_t), outfile);
             }
          }
          free(temp_16);
@@ -148,7 +148,7 @@ short ImageWrite(StructCodingPara *StrPtr,  int **image)
       {
          short *temp_16 = (short *)calloc(sizeof(short), StrPtr->ImageWidth);
 
-         WORD16 PixelMax = 0;
+         uint16_t PixelMax = 0;
          int PixelMin = 0;
 
          if (StrPtr->PtrHeader->Header.Part4.PixelBitDepth_4Bits == 0)
@@ -209,8 +209,8 @@ void DecodingOutputInteger(StructCodingPara *PtrCP,
 
    if (PtrCP->PtrHeader->Header.Part4.TransposeImg == TRANSPOSE)
    {
-      UINT32 i = 0;
-      UINT32 j = 0;
+      uint32_t i = 0;
+      uint32_t j = 0;
       int **transposedimg = (int **)calloc(PtrCP->ImageRows,sizeof(int *));
 
       for(i = 0; i < PtrCP->ImageRows; i++)
@@ -235,10 +235,10 @@ void DecodingOutputInteger(StructCodingPara *PtrCP,
 short ImageWriteFloat(StructCodingPara *StrPtr,
              float **image)
 {
-   UINT32 r = 0;
-   UINT32 i = 0;
+   uint32_t r = 0;
+   uint32_t i = 0;
    FILE *outfile;
-   UCHAR8 machineendianness;  // indicates endian-ness of the computer -- bug fix (Kiely)
+   uint8_t machineendianness;  // indicates endian-ness of the computer -- bug fix (Kiely)
    unsigned long int bigendtest = 1;  //  bug fix (Kiely)
 
 
@@ -250,7 +250,7 @@ short ImageWriteFloat(StructCodingPara *StrPtr,
    {
       if(StrPtr->PtrHeader->Header.Part4.SignedPixels == FALSE) // unsigned image
       {
-         UCHAR8 *temp = (UCHAR8 *)calloc(sizeof(UCHAR8), StrPtr->ImageWidth);
+         uint8_t *temp = (uint8_t *)calloc(sizeof(uint8_t), StrPtr->ImageWidth);
 
          for(r = 0; r< StrPtr->ImageRows; r++)
          {
@@ -258,7 +258,7 @@ short ImageWriteFloat(StructCodingPara *StrPtr,
             {
                image[r][i] = (image[r][i] > 0xFF)?0xFF :image[r][i] ;
                image[r][i] = (image[r][i] < 0)?0 :image[r][i] ;
-               temp[i] = (UCHAR8)image[r][i];
+               temp[i] = (uint8_t)image[r][i];
             }
             fwrite(temp, StrPtr->ImageWidth, sizeof(char),outfile);
          }
@@ -290,8 +290,8 @@ short ImageWriteFloat(StructCodingPara *StrPtr,
 
       if(StrPtr->PtrHeader->Header.Part4.SignedPixels == FALSE) // unsigned image
       {
-         WORD16 PixelMax;
-         WORD16 *temp_16 = (WORD16 *)calloc(sizeof(WORD16), StrPtr->ImageWidth);
+         uint16_t PixelMax;
+         uint16_t *temp_16 = (uint16_t *)calloc(sizeof(uint16_t), StrPtr->ImageWidth);
 
          if (StrPtr->PtrHeader->Header.Part4.PixelBitDepth_4Bits == 0)
             PixelMax = (1 << 16) - 1;
@@ -307,9 +307,9 @@ short ImageWriteFloat(StructCodingPara *StrPtr,
                   image[r][i] = (image[r][i] > PixelMax) ? PixelMax : image[r][i];
                   image[r][i] = (image[r][i] < 0) ? 0 : image[r][i];
                   image[r][i] = (float)( ( ((int)(image[r][i])) << 8) & MSBmask ) + (((int)(image[r][i])) >> 8);  //  bug fix (Kiely)
-                  temp_16[i] = (WORD16)image[r][i] ;
+                  temp_16[i] = (uint16_t)image[r][i] ;
                }
-               fwrite(temp_16, StrPtr->ImageWidth, sizeof(WORD16), outfile);
+               fwrite(temp_16, StrPtr->ImageWidth, sizeof(uint16_t), outfile);
             }
          else
          {
@@ -319,9 +319,9 @@ short ImageWriteFloat(StructCodingPara *StrPtr,
                {
                   image[r][i] = (image[r][i] > PixelMax) ? PixelMax : image[r][i];
                   image[r][i] = (image[r][i] < 0) ? 0 : image[r][i];
-                  temp_16[i] =(WORD16)image[r][i] ;
+                  temp_16[i] =(uint16_t)image[r][i] ;
                }
-               fwrite(temp_16, StrPtr->ImageWidth, sizeof(WORD16), outfile);
+               fwrite(temp_16, StrPtr->ImageWidth, sizeof(uint16_t), outfile);
             }
          }
          free(temp_16);
@@ -330,7 +330,7 @@ short ImageWriteFloat(StructCodingPara *StrPtr,
       {
          short *temp_16 = (short *)calloc(sizeof(short), StrPtr->ImageWidth);
 
-         WORD16 PixelMax = 0;
+         uint16_t PixelMax = 0;
          int PixelMin = 0;
 
          if (StrPtr->PtrHeader->Header.Part4.PixelBitDepth_4Bits == 0)
@@ -387,8 +387,8 @@ void DecodingOutputFloating(StructCodingPara *PtrCP,
 
    if (PtrCP->PtrHeader->Header.Part4.TransposeImg == TRANSPOSE)
    {
-      UINT32 i = 0;
-      UINT32 j = 0;
+      uint32_t i = 0;
+      uint32_t j = 0;
       float **transposedimg = (float **)calloc(PtrCP->ImageRows,sizeof(float *));
 
       for(i = 0; i < PtrCP->ImageRows; i++)
@@ -416,7 +416,7 @@ void TempCoeffOutput(FILE *fdc,
                 BitPlaneBits *BlockCodingInfo,
                 StructCodingPara * PtrCoding)
 {
-   UINT32 i;
+   uint32_t i;
    int totalbytes_counter = 0;
 
    for(i = 0; i < PtrCoding->PtrHeader->Header.Part3.S_20Bits; i ++)
@@ -437,12 +437,12 @@ void TempCoeffOutput(FILE *fdc,
 
 void SegmentBufferFlushDecoder(StructCodingPara *StrCoding) // flush codes and reset
 {
-   DWORD32 codeWordLengthInBits, temp, remBits, padBits;
+   uint32_t codeWordLengthInBits, temp, remBits, padBits;
 
    if((StrCoding->PtrHeader->Header.Part2.SegByteLimit_27Bits != 0)
       &&(StrCoding->SegmentFull == FALSE) && StrCoding->PtrHeader->Header.Part2.UseFill == TRUE)
    {
-      DWORD32 temp = 0;
+      uint32_t temp = 0;
       while(StrCoding->SegmentFull == FALSE)
       {
          BitsRead(StrCoding, &temp, 8);
@@ -465,11 +465,11 @@ void SegmentBufferFlushDecoder(StructCodingPara *StrCoding) // flush codes and r
 
 void DecoderEngine(StructCodingPara * PtrCoding)
 {
-   UINT32 i = 0;
-   UINT32 j = 0;
-   UINT32 X = 0;
-   UINT32 Y = 0;
-   UINT32 TotalBlocks = 0;
+   uint32_t i = 0;
+   uint32_t j = 0;
+   uint32_t X = 0;
+   uint32_t Y = 0;
+   uint32_t TotalBlocks = 0;
    StructFreBlockString* pStrToFree;
 
    int **imgout_integercase = NULL;
@@ -551,7 +551,7 @@ void DecoderEngine(StructCodingPara * PtrCoding)
    while(StrFreBlockString->previous != NULL)
       StrFreBlockString = StrFreBlockString->previous;
    do{
-      UINT32 F_x = 0;
+      uint32_t F_x = 0;
       do
       {
          for( i = 0; i < BLOCK_SIZE; i++)

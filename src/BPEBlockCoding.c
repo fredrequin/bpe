@@ -28,11 +28,11 @@ void BlockScanEncode(StructCodingPara *PtrCoding,
    short temp_x = 0;
    short temp_y = 0;
    short counter = 0;
-   UCHAR8 BitPlane = PtrCoding->BitPlane;
-   UCHAR8 si = 0;
-   WORD16 temp;
-   DWORD32 BlockSeq;
-   DWORD32 Bit_Set_Plane = (1 << (BitPlane - 1)) ;
+   uint8_t BitPlane = PtrCoding->BitPlane;
+   uint8_t si = 0;
+   uint16_t temp;
+   uint32_t BlockSeq;
+   uint32_t Bit_Set_Plane = (1 << (BitPlane - 1)) ;
    long ** block = NULL;
 
    for (BlockSeq = 0;   BlockSeq < PtrCoding->PtrHeader->Header.Part3.S_20Bits; BlockSeq++)
