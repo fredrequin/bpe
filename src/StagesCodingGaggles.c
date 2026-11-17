@@ -28,21 +28,21 @@ extern void BitPlaneSymbolReset(StrSymbolDetails *SymbolStr);
 
 void StagesEnCodingGaggles1(StructCodingPara *PtrCoding,
                          BitPlaneBits *BlockInfo,
-                         uint8_t BlocksInGaggles,
+                         int BlocksInGaggles,
                          uint8_t Option[],
                          BOOL FlagCodeOptionOutput[]  )
 {
-   uint8_t SymbolIndex = 0;
-   uint32_t BlockSeq = 0;
+   int SymbolIndex;
+   int BlockSeq;
    short i;
    short counter= 0;
 
    // nkeffix : Implement StageStop in 122x0b1c3 section 4.2.3.1 Table 4-5
    if (PtrCoding->PtrHeader->Header.Part2.StageStop_2Bits == 0 &&
       (PtrCoding->PtrHeader->Header.Part2.BitPlaneStop_5Bits == PtrCoding->BitPlane - 1 ||
-         PtrCoding->altStrageStop))
+         PtrCoding->altStageStop))
       return;
-   for (BlockSeq = 0; BlockSeq <BlocksInGaggles; BlockSeq ++)
+   for (BlockSeq = 0; BlockSeq <BlocksInGaggles; BlockSeq++)
    {
       if (BlockInfo[BlockSeq].BitMaxAC < PtrCoding->BitPlane)
          continue;
@@ -100,22 +100,22 @@ void StagesEnCodingGaggles1(StructCodingPara *PtrCoding,
 
 void StagesEnCodingGaggles2(StructCodingPara *PtrCoding,
                          BitPlaneBits *BlockInfo,
-                         uint8_t BlocksInGaggles,
+                         int BlocksInGaggles,
                          uint8_t Option[],
                          BOOL FlagCodeOptionOutput[])
 {
-   uint8_t SymbolIndex = 0;
-   uint32_t BlockSeq = 0;
+   int SymbolIndex;
+   int BlockSeq;
    short i;
    short counter= 0;
 
    // nkeffix : Implement StageStop in 122x0b1c3 section 4.2.3.1 Table 4-5
    if (PtrCoding->PtrHeader->Header.Part2.StageStop_2Bits < 1 &&
       (PtrCoding->PtrHeader->Header.Part2.BitPlaneStop_5Bits == PtrCoding->BitPlane - 1 ||
-       PtrCoding->altStrageStop))
+       PtrCoding->altStageStop))
       return;
 
-   for ( BlockSeq = 0; BlockSeq < BlocksInGaggles; BlockSeq ++)
+   for (BlockSeq = 0; BlockSeq < BlocksInGaggles; BlockSeq++)
    {
       if (BlockInfo[BlockSeq].BitMaxAC < PtrCoding->BitPlane)
          continue;
@@ -160,22 +160,22 @@ void StagesEnCodingGaggles2(StructCodingPara *PtrCoding,
 
 void StagesEnCodingGaggles3(StructCodingPara *PtrCoding,
                          BitPlaneBits *BlockInfo,
-                         uint8_t BlocksInGaggles,
+                         int BlocksInGaggles,
                          uint8_t Option[],
                          BOOL FlagCodeOptionOutput[])
 {
-   uint8_t SymbolIndex = 0;
-   uint32_t BlockSeq = 0;
+   int SymbolIndex;
+   int BlockSeq;
    short i;
    short counter= 0;
 
    // nkeffix : Implement StageStop in 122x0b1c3 section 4.2.3.1 Table 4-5
    if (PtrCoding->PtrHeader->Header.Part2.StageStop_2Bits < 2 &&
        (PtrCoding->PtrHeader->Header.Part2.BitPlaneStop_5Bits == PtrCoding->BitPlane - 1 ||
-        PtrCoding->altStrageStop))
+        PtrCoding->altStageStop))
       return;
 
-   for ( BlockSeq = 0; BlockSeq < BlocksInGaggles; BlockSeq ++)
+   for (BlockSeq = 0; BlockSeq < BlocksInGaggles; BlockSeq++)
    {
 
       if (BlockInfo[BlockSeq].BitMaxAC < PtrCoding->BitPlane)
@@ -227,20 +227,20 @@ extern void DeMappingPattern(StrSymbolDetails *StrSymbol);
 
 void StagesDeCodingGaggles1(StructCodingPara *PtrCoding,
                      BitPlaneBits *BlockCodingInfo,
-                     uint8_t BlocksInGaggles,
+                     int BlocksInGaggles,
                      uint8_t *CodeOptionsAllGaggles,
                      BOOL *FlagCodeOptionOutput)
 {
    uint8_t temp_x;
    uint8_t temp_y;
    uint8_t counter;
-   uint8_t BlockSeq;
+   int BlockSeq;
    uint8_t RefCounter = 0;
    int i;
    uint8_t BitPlane = PtrCoding->BitPlane;
    StrSymbolDetails StrSymbol;
 
-   for ( BlockSeq = 0; BlockSeq < BlocksInGaggles; BlockSeq ++)
+   for (BlockSeq = 0; BlockSeq < BlocksInGaggles; BlockSeq++)
    {
       if (BlockCodingInfo[BlockSeq].BitMaxAC < BitPlane)
          continue;
@@ -394,14 +394,14 @@ void StagesDeCodingGaggles1(StructCodingPara *PtrCoding,
 
 void StagesDeCodingGaggles2(StructCodingPara *PtrCoding,
                      BitPlaneBits *BlockCodingInfo,
-                     uint8_t BlocksInGaggles,
+                     int BlocksInGaggles,
                      uint8_t *CodeOptionsAllGaggles,
                      BOOL *FlagCodeOptionOutput)
 {
    uint8_t temp_x;
    uint8_t temp_y;
    uint8_t counter;
-   uint8_t BlockSeq;
+   int BlockSeq;
    int i;
    int k;
    int p;
@@ -413,10 +413,10 @@ void StagesDeCodingGaggles2(StructCodingPara *PtrCoding,
    // nkeffix : Implement StageStop in 122x0b1c3 section 4.2.3.1 Table 4-5
    if(PtrCoding->PtrHeader->Header.Part2.StageStop_2Bits < 1 &&
       (PtrCoding->PtrHeader->Header.Part2.BitPlaneStop_5Bits == BitPlane - 1 ||
-       PtrCoding->altStrageStop))
+       PtrCoding->altStageStop))
       return;
 
-   for ( BlockSeq = 0; BlockSeq < BlocksInGaggles; BlockSeq ++)
+   for (BlockSeq = 0; BlockSeq < BlocksInGaggles; BlockSeq++)
    {
       if (BlockCodingInfo[BlockSeq].BitMaxAC < BitPlane)
          continue;
@@ -725,14 +725,14 @@ void StagesDeCodingGaggles2(StructCodingPara *PtrCoding,
 
 void StagesDeCodingGaggles3(StructCodingPara *PtrCoding,
                      BitPlaneBits *BlockCodingInfo,
-                     uint8_t BlocksInGaggles,
+                     int BlocksInGaggles,
                      uint8_t *CodeOptionsAllGaggles,
                      BOOL *FlagCodeOptionOutput)
 {
    uint8_t temp_x;
    uint8_t temp_y;
    uint8_t counter;
-   uint32_t BlockSeq;
+   int BlockSeq;
    int i;
    int k;
    int p;
@@ -744,7 +744,7 @@ void StagesDeCodingGaggles3(StructCodingPara *PtrCoding,
    // nkeffix : Implement StageStop in 122x0b1c3 section 4.2.3.1 Table 4-5
    if (PtrCoding->PtrHeader->Header.Part2.StageStop_2Bits < 2 &&
       (PtrCoding->PtrHeader->Header.Part2.BitPlaneStop_5Bits == BitPlane - 1 ||
-       PtrCoding->altStrageStop))
+       PtrCoding->altStageStop))
       return;
 
    for (BlockSeq = 0; BlockSeq < BlocksInGaggles; BlockSeq ++)

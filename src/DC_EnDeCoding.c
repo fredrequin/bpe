@@ -177,8 +177,8 @@ void DCEntropyEncoder(StructCodingPara* PtrCoding,
 {
    int Max_k = 0;
    int ID_Length = 0;
-   uint32_t GaggleStartIndex = 0;
-   uint32_t gaggles = 0;
+   int GaggleStartIndex = 0;
+   int gaggles = 0;
 
    if (PtrCoding->N  == 2) {
       Max_k = 0;
@@ -196,7 +196,8 @@ void DCEntropyEncoder(StructCodingPara* PtrCoding,
 
 
    /* --- Begin bug fix (Kiely) --- */
-   while( GaggleStartIndex < PtrCoding->PtrHeader->Header.Part3.S_20Bits ){
+   while (GaggleStartIndex < PtrCoding->PtrHeader->Header.Part3.S_20Bits)
+   {
       gaggles = min(GAGGLE_SIZE, PtrCoding->PtrHeader->Header.Part3.S_20Bits - GaggleStartIndex);
       DCEncoder(PtrCoding, BlockInfo, GaggleStartIndex, gaggles, Max_k, ID_Length);
       GaggleStartIndex += gaggles;

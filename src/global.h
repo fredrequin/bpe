@@ -39,24 +39,24 @@ typedef unsigned char BOOL;
 #define AMPLITUDE(a) ((a) >=0 ? (a): -(a))
 
 
-#define BPE_OK            0
-#define BPE_STREAM_END    1
-#define BPE_FILE_ERROR   (2)
-#define BPE_STREAM_ERROR (3)
-#define BPE_DATA_ERROR   (4)
-#define BPE_MEM_ERROR    (5)
-#define BPE_BLOCKSCAN_CODING_ERROR    (6)
-#define BPE_DYNAMICAL_RANGE_ERROR (7)
-#define BPE_RATE_ERROR    (8)
-#define BPE_RATE_UNREACHABLE (9)
-#define BPE_WAVELET_INVALID (10)
-#define BPE_IMAGE_SIZE_WRONG (11)
-#define BPE_SCALLING_FILE_ERROR (12)
-#define BPE_INVALID_HEADER (13)
+#define BPE_OK                         (0)
+#define BPE_STREAM_END                 (1)
+#define BPE_FILE_ERROR                 (2)
+#define BPE_STREAM_ERROR               (3)
+#define BPE_DATA_ERROR                 (4)
+#define BPE_MEM_ERROR                  (5)
+#define BPE_BLOCKSCAN_CODING_ERROR     (6)
+#define BPE_DYNAMICAL_RANGE_ERROR      (7)
+#define BPE_RATE_ERROR                 (8)
+#define BPE_RATE_UNREACHABLE           (9)
+#define BPE_WAVELET_INVALID           (10)
+#define BPE_IMAGE_SIZE_WRONG          (11)
+#define BPE_SCALLING_FILE_ERROR       (12)
+#define BPE_INVALID_HEADER            (13)
 #define BPE_INVALID_CODING_PARAMETERS (14)
-#define BPE_PATTERNING_CODING_ERROR (15)
-#define BPE_RICE_CODING_ERROR (16)
-#define BPE_STAGE_CODING_ERROR (17)
+#define BPE_PATTERNING_CODING_ERROR   (15)
+#define BPE_RICE_CODING_ERROR         (16)
+#define BPE_STAGE_CODING_ERROR        (17)
 
 #define   ENUM_NONE 0
 #define   ENUM_TYPE_P 1
@@ -67,9 +67,9 @@ typedef unsigned char BOOL;
 #define   ENUM_TRAN_HI 6 // i = 0, 1, 2. j = 0, 1, 2, 3; four bits
 #define   ENUM_TYPE_HIJ 7
 
-#define BLOCK_SIZE 8
-#define NEGATIVE_SIGN 1
-#define POSITIVE_SIGN 0
+#define BLOCK_SIZE    (8)
+#define NEGATIVE_SIGN (1)
+#define POSITIVE_SIGN (0)
 
 #define max(a,b)    (((a) > (b)) ? (a) : (b))
 #define min(a,b)    (((a) < (b)) ? (a) : (b))
@@ -85,7 +85,12 @@ typedef unsigned char BOOL;
 #define SEGBYTE_MAX (1 << 27)
 #define DCDEPTH_MAX (1 << 5)
 #define ACDEPTH_MAX (1 << 5)
-#define MAX_SEGMENT_SIZE 134217728  // 2^27
+
+#define BLOCK_SEGMENT_SIZE      (1 << 20)
+#define BLOCK_SEGMENT_MASK      (BLOCK_SEGMENT_SIZE - 1)
+#define BYTE_SEGMENT_SIZE       (1 << 27)
+#define BYTE_SEGMENT_MASK       (BYTE_SEGMENT_SIZE - 1)
+
 //////////////////////////////////////////////////////////////////////////////
 
 typedef struct BITSTREAM
@@ -170,8 +175,8 @@ typedef struct BLOCKBITSHIT
    float **PtrBlockAddressFloating;
 
    //Bit plane and block information.
-   uint8_t  BitPlane : 5;
-   long     BlockIndex : 20;
+   //uint8_t  BitPlane : 5;
+   //long     BlockIndex : 20;
    // DC and AC_max information
    uint32_t MappedDC;
    int32_t  ShiftedDC;
@@ -208,21 +213,20 @@ typedef struct HEADER_STRUCTURE_PART1
 
 typedef struct HEADER_STRUCTURE_PART2
 {
-   uint32_t SegByteLimit_27Bits : 27; // 27 bits.
-   BOOL DCstop : 1; //indicate whether the compressed output stops.
-   uint8_t BitPlaneStop_5Bits : 5; // 5 bits
-   uint8_t StageStop_2Bits : 2; // 2 bits, transform input data quantication.
-   BOOL UseFill : 1;
-   uint8_t Reserved_4Bits : 4; // 4 bits
-}HeaderPart2;
-
+   uint32_t SegByteLimit_27Bits; // 27 bits used
+   BOOL     DCstop;              // 1 bit used, indicate whether the compressed output stops.
+   uint8_t  BitPlaneStop_5Bits;  // 5 bits used
+   uint8_t  StageStop_2Bits;     // 2 bits used, transform input data quantication.
+   BOOL     UseFill;             // 1 bit used
+   uint8_t  Reserved_4Bits;      // 4 bits left
+} HeaderPart2;
 
 typedef struct HEADER_STRUCTURE_PART3
 {
-   uint32_t S_20Bits : 20; //max number of blocks in a segment is limited to 2^20
-   BOOL OptDCSelect : 1;
-   BOOL OptACSelect : 1;
-   uint8_t Reserved_2Bits : 2;
+   int32_t  S_20Bits;            // max number of blocks in a segment is limited to 2^20
+   BOOL     OptDCSelect;         // 1 bit used
+   BOOL     OptACSelect;         // 1 bit used
+   uint8_t  Reserved_2Bits;      // 2 bits left
 }HeaderPart3;
 
 typedef struct HEADER_STRUCTURE_PART4
@@ -294,14 +298,14 @@ typedef struct CODINGPARAMETERS
    uint8_t PixelByteOrder:1; // default byte order. 1 means LSB first.
    char InputFile[MAX_FILE_NAME_SIZE];
    char CodingOutputFile[MAX_FILE_NAME_SIZE];
-   BOOL altStrageStop; // Alternative stage stop
+   BOOL altStageStop; // Alternative stage stop
 } StructCodingPara;
 
 typedef struct BLOCKSTRING
 {
    long **FreqBlkString;
    float ** FloatingFreqBlk;
-   uint32_t Blocks;
+   int32_t Blocks;
    struct BLOCKSTRING *next;
    struct BLOCKSTRING *previous;
 }StructFreBlockString;

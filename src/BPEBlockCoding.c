@@ -18,8 +18,7 @@ Nov. 3, 2006
 #include <math.h>
 #include "global.h"
 
-void BlockScanEncode(StructCodingPara *PtrCoding,
-                BitPlaneBits *BlockInfo)
+void BlockScanEncode(StructCodingPara *PtrCoding, BitPlaneBits *BlockInfo)
 {
    int i = 0;
    int j = 0;
@@ -31,17 +30,16 @@ void BlockScanEncode(StructCodingPara *PtrCoding,
    uint8_t BitPlane = PtrCoding->BitPlane;
    uint8_t si = 0;
    uint16_t temp;
-   uint32_t BlockSeq;
+   int BlockSeq;
    uint32_t Bit_Set_Plane = (1 << (BitPlane - 1)) ;
    long ** block = NULL;
 
-   for (BlockSeq = 0;   BlockSeq < PtrCoding->PtrHeader->Header.Part3.S_20Bits; BlockSeq++)
+   for (BlockSeq = 0; BlockSeq < PtrCoding->PtrHeader->Header.Part3.S_20Bits; BlockSeq++)
    {
       si = 0;
-      if (BlockInfo[BlockSeq].BitMaxAC < BitPlane)
-         continue;
+      if (BlockInfo[BlockSeq].BitMaxAC < BitPlane) continue;
 
-      PtrCoding->block_index = BlockSeq;
+      //PtrCoding->block_index = BlockSeq;
       block = BlockInfo[BlockSeq].PtrBlockAddress;
 
    // check the parents.

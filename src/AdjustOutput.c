@@ -31,7 +31,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
    short beta_2 = 0;
    float refinement = 0;
    uint32_t BitPlaneCheck = 0; // to check if a bit plane has bit 1.
-   int TotalBlocks = (int)PtrCoding->PtrHeader->Header.Part3.S_20Bits;
+   int TotalBlocks = PtrCoding->PtrHeader->Header.Part3.S_20Bits;
 
    // determine the stages to do the decoding process.
 
@@ -2844,7 +2844,8 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                 }
          else // floating
          {
-            float beta_1,    beta_2;
+            float beta_1, beta_2;
+
             BitPlaneCheck = (1 << PtrCoding->DecodingStopLocations.BitPlaneStopDecoding);
             if (b_DC >= 1)
             {
@@ -2853,15 +2854,15 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                     *(*BlockCodingInfo[i].PtrBlockAddressFloating) += temp;
             }
 
-            if(PtrCoding->DecodingStopLocations.BitPlaneStopDecoding >= 1)
+            if (PtrCoding->DecodingStopLocations.BitPlaneStopDecoding >= 1)
             {
-               beta_1 =(float)( (1 << ( PtrCoding->DecodingStopLocations.BitPlaneStopDecoding - 1)) - 0.5);
+               beta_1 = (float)((1 << ( PtrCoding->DecodingStopLocations.BitPlaneStopDecoding - 1)) - 0.5);
                beta_2 = (float)((1 << ( PtrCoding->DecodingStopLocations.BitPlaneStopDecoding )) - 0.5);
             }
             else
             {
                beta_1 = 0;
-               if (PtrCoding->DecodingStopLocations.BitPlaneStopDecoding ==0)
+               if (PtrCoding->DecodingStopLocations.BitPlaneStopDecoding == 0)
                beta_2 = 0.5;
             }
 

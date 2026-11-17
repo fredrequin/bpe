@@ -27,19 +27,19 @@ const int bit4_pattern_TypeHij_TranHi[] = {0, 1, 3, 6, 2, 5, 9, 11, 0, 8, 7, 12,
 
 extern void StagesEnCodingGaggles1(StructCodingPara *PtrCoding,
                          BitPlaneBits *BlockInfo,
-                         uint8_t BlocksInGaggles,
+                         int BlocksInGaggles,
                          uint8_t Option[],
                          BOOL FlagCodeOptionOutput[]);
 
 extern void StagesEnCodingGaggles2(StructCodingPara *PtrCoding,
                          BitPlaneBits *BlockInfo,
-                         uint8_t BlocksInGaggles,
+                         int BlocksInGaggles,
                          uint8_t Option[],
                          BOOL FlagCodeOptionOutput[]);
 
 extern void StagesEnCodingGaggles3(StructCodingPara *PtrCoding,
                          BitPlaneBits *BlockInfo,
-                         uint8_t BlocksInGaggles,
+                         int BlocksInGaggles,
                          uint8_t Option[],
                          BOOL FlagCodeOptionOutput[]);
 
@@ -157,16 +157,16 @@ void BitPlaneSymbolReset(StrSymbolDetails *SymbolStr)
 
 void CodingOptions(StructCodingPara *PtrCoding,
                BitPlaneBits *BlockInfo,
-               uint32_t BlocksInGaggle,
+               int BlocksInGaggle,
                uint8_t Option[])
 {
 
-   uint32_t BlockSeq = 0;
+   int BlockSeq;
    uint32_t bitsCounter_2Bits[2] = {0};
    uint32_t bitsCounter_3Bits[3] = {0};
    uint32_t bitsCounter_4Bits[4] = {0};
 
-   for ( BlockSeq = 0; BlockSeq < BlocksInGaggle; BlockSeq ++)
+   for (BlockSeq = 0; BlockSeq < BlocksInGaggle; BlockSeq ++)
    {
       uint8_t SymbolIndex = 0;
       if (BlockInfo[BlockSeq].BitMaxAC < PtrCoding->BitPlane)
@@ -344,7 +344,7 @@ void RefBitsDe( StructCodingPara *PtrCoding,
             BitPlaneBits * BlockInfo)
 
 {
-   uint32_t BlockSeq;
+   int BlockSeq;
    uint8_t i;
    uint8_t j;
    uint8_t k;
@@ -356,7 +356,7 @@ void RefBitsDe( StructCodingPara *PtrCoding,
    // nkeffix : Implement StageStop in 122x0b1c3 section 4.2.3.1 Table 4-5
    if(PtrCoding->PtrHeader->Header.Part2.StageStop_2Bits < 3 &&
       (PtrCoding->PtrHeader->Header.Part2.BitPlaneStop_5Bits == BitPlane - 1 ||
-       PtrCoding->altStrageStop))
+       PtrCoding->altStageStop))
       return;
 
    PtrCoding->DecodingStopLocations.BlockNoStopDecoding = 0;
@@ -528,16 +528,15 @@ void RefBitsDe( StructCodingPara *PtrCoding,
 void RefBitsEn(BitPlaneBits * BlockInfo,
             StructCodingPara *PtrCoding)
 {
-   uint32_t i;
-   uint8_t j;
+   int i, j;
 
    // nkeffix : Implement StageStop in 122x0b1c3 section 4.2.3.1 Table 4-5
    if (PtrCoding->PtrHeader->Header.Part2.StageStop_2Bits < 3 &&
       (PtrCoding->PtrHeader->Header.Part2.BitPlaneStop_5Bits == PtrCoding->BitPlane - 1 ||
-       PtrCoding->altStrageStop))
+       PtrCoding->altStageStop))
       return;
 
-   for( i = 0; i < PtrCoding->PtrHeader->Header.Part3.S_20Bits; i ++)
+   for (i = 0; i < PtrCoding->PtrHeader->Header.Part3.S_20Bits; i ++)
    {
       // encoding TypeP first.
       if (BlockInfo[i].RefineBits.RefineParent.ParentSymbolLength > 0)
@@ -561,7 +560,7 @@ void RefBitsEn(BitPlaneBits * BlockInfo,
          BlockInfo[i].RefineBits.RefineChildren.ChildrenSymbolLength = 0;
 
       }
-      for( j = 0; j < 3; j ++)
+      for (j = 0; j < 3; j++)
       {
          if (BlockInfo[i].RefineBits.RefineGrandChildren[j].GrandChildrenSymbolLength > 0)
             BitsOutput(PtrCoding,
@@ -578,61 +577,59 @@ void RefBitsEn(BitPlaneBits * BlockInfo,
 void StagesEnCoding(StructCodingPara *PtrCoding,
                BitPlaneBits *BlockInfo)
 {
-   // try various options for the 2-bit, 3-bit, and 4 bit coding.
-   uint8_t BlocksInLastGaggle = 0;
-   uint32_t TotalGaggles;
-   uint32_t GaggleIndex = 0;
-   uint8_t **CodeOptionsAllGaggles;
-   uint8_t BlocksInGaggle = 0;
-   uint32_t BlockStartIndex = 0;
-   BOOL **OptionHitFlag;
-    uint32_t SymbolIndex;
+    // try various options for the 2-bit, 3-bit, and 4 bit coding.
+    int TotalGaggles;
+    int GaggleIndex;
+    uint8_t **CodeOptionsAllGaggles;
+    int BlocksInGaggle;
+    int BlockStartIndex;
+    BOOL **OptionHitFlag;
 
-   BlocksInLastGaggle = (uint8_t) (PtrCoding->PtrHeader->Header.Part3.S_20Bits % GAGGLE_SIZE) ;
-   TotalGaggles = PtrCoding->PtrHeader->Header.Part3.S_20Bits / GAGGLE_SIZE;
-   // bit length is equal to 1, nk = 0;
+    TotalGaggles = PtrCoding->PtrHeader->Header.Part3.S_20Bits / GAGGLE_SIZE;
+    if (PtrCoding->PtrHeader->Header.Part3.S_20Bits % GAGGLE_SIZE) TotalGaggles++;
 
-   if( BlocksInLastGaggle!= 0)
-      TotalGaggles++;
-   CodeOptionsAllGaggles = (uint8_t **)calloc(TotalGaggles, sizeof(uint8_t *)) ;
-   OptionHitFlag = (BOOL **) calloc(TotalGaggles, sizeof(BOOL *)) ;
+    CodeOptionsAllGaggles = (uint8_t **)calloc(TotalGaggles, sizeof(uint8_t *)) ;
+    OptionHitFlag = (BOOL **) calloc(TotalGaggles, sizeof(BOOL *)) ;
 
-   // 4.1 Pattern values.
+    // 4.1 Pattern values.
 
-   for (GaggleIndex = 0; GaggleIndex < TotalGaggles; GaggleIndex ++)
-   {
-      BlockStartIndex = GaggleIndex * GAGGLE_SIZE;
-      CodeOptionsAllGaggles[GaggleIndex] = (uint8_t *)calloc(3, sizeof(uint8_t)) ;
-      OptionHitFlag[GaggleIndex] =  (BOOL *)calloc(3, sizeof(BOOL)) ;
-      OptionHitFlag[GaggleIndex][0] = FALSE;
-      OptionHitFlag[GaggleIndex][1] = FALSE;
-      OptionHitFlag[GaggleIndex][2] = FALSE;
-      BlocksInGaggle = (uint8_t)((BlockStartIndex + GAGGLE_SIZE < PtrCoding->PtrHeader->Header.Part3.S_20Bits) ?
-                   GAGGLE_SIZE : (PtrCoding->PtrHeader->Header.Part3.S_20Bits - BlockStartIndex)) ;
+    for (GaggleIndex = 0; GaggleIndex < TotalGaggles; GaggleIndex++)
+    {
+        CodeOptionsAllGaggles[GaggleIndex] = (uint8_t *)calloc(3, sizeof(uint8_t)) ;
+        OptionHitFlag[GaggleIndex] =  (BOOL *)calloc(3, sizeof(BOOL)) ;
+        OptionHitFlag[GaggleIndex][0] = FALSE;
+        OptionHitFlag[GaggleIndex][1] = FALSE;
+        OptionHitFlag[GaggleIndex][2] = FALSE;
+        BlockStartIndex = GaggleIndex * GAGGLE_SIZE;
+        BlocksInGaggle  = ((BlockStartIndex + GAGGLE_SIZE) < PtrCoding->PtrHeader->Header.Part3.S_20Bits)
+                        ? GAGGLE_SIZE : PtrCoding->PtrHeader->Header.Part3.S_20Bits - BlockStartIndex;
 
-      CodingOptions(PtrCoding, &(BlockInfo[BlockStartIndex]) , BlocksInGaggle, (CodeOptionsAllGaggles[GaggleIndex]));
+        CodingOptions(PtrCoding, &(BlockInfo[BlockStartIndex]), BlocksInGaggle, (CodeOptionsAllGaggles[GaggleIndex]));
 
-      StagesEnCodingGaggles1(PtrCoding, &(BlockInfo[BlockStartIndex]) ,
-         BlocksInGaggle, (CodeOptionsAllGaggles[GaggleIndex]), OptionHitFlag[GaggleIndex] );
-   }
+        StagesEnCodingGaggles1(PtrCoding, &(BlockInfo[BlockStartIndex]),
+                               BlocksInGaggle, CodeOptionsAllGaggles[GaggleIndex], OptionHitFlag[GaggleIndex]);
+    }
 
-      for (GaggleIndex = 0; GaggleIndex < TotalGaggles; GaggleIndex ++)
-   {
-      BlockStartIndex = GaggleIndex * GAGGLE_SIZE;
-      BlocksInGaggle = (uint8_t) ((BlockStartIndex + GAGGLE_SIZE < PtrCoding->PtrHeader->Header.Part3.S_20Bits) ?
-                     GAGGLE_SIZE : (PtrCoding->PtrHeader->Header.Part3.S_20Bits - BlockStartIndex))  ;
-      StagesEnCodingGaggles2(PtrCoding, &(BlockInfo[BlockStartIndex]) ,
-         BlocksInGaggle, (CodeOptionsAllGaggles[GaggleIndex]), OptionHitFlag[GaggleIndex] );
-   }
-   for (GaggleIndex = 0; GaggleIndex < TotalGaggles; GaggleIndex ++)
-   {
-      BlockStartIndex = GaggleIndex * GAGGLE_SIZE;
-      BlocksInGaggle = (uint8_t) ((BlockStartIndex + GAGGLE_SIZE < PtrCoding->PtrHeader->Header.Part3.S_20Bits) ?
-                     GAGGLE_SIZE : (PtrCoding->PtrHeader->Header.Part3.S_20Bits - BlockStartIndex)) ;
-      StagesEnCodingGaggles3(PtrCoding, &(BlockInfo[BlockStartIndex]) ,
-         BlocksInGaggle, (CodeOptionsAllGaggles[GaggleIndex]), OptionHitFlag[GaggleIndex] );
-   }
-   RefBitsEn(BlockInfo, PtrCoding);
+    for (GaggleIndex = 0; GaggleIndex < TotalGaggles; GaggleIndex ++)
+    {
+        BlockStartIndex = GaggleIndex * GAGGLE_SIZE;
+        BlocksInGaggle  = ((BlockStartIndex + GAGGLE_SIZE) < PtrCoding->PtrHeader->Header.Part3.S_20Bits)
+                        ? GAGGLE_SIZE : PtrCoding->PtrHeader->Header.Part3.S_20Bits - BlockStartIndex;
+
+        StagesEnCodingGaggles2(PtrCoding, &(BlockInfo[BlockStartIndex]),
+                               BlocksInGaggle, CodeOptionsAllGaggles[GaggleIndex], OptionHitFlag[GaggleIndex]);
+    }
+
+    for (GaggleIndex = 0; GaggleIndex < TotalGaggles; GaggleIndex ++)
+    {
+        BlockStartIndex = GaggleIndex * GAGGLE_SIZE;
+        BlocksInGaggle  = ((BlockStartIndex + GAGGLE_SIZE) < PtrCoding->PtrHeader->Header.Part3.S_20Bits)
+                        ? GAGGLE_SIZE : PtrCoding->PtrHeader->Header.Part3.S_20Bits - BlockStartIndex;
+
+        StagesEnCodingGaggles3(PtrCoding, &(BlockInfo[BlockStartIndex]),
+                               BlocksInGaggle, CodeOptionsAllGaggles[GaggleIndex], OptionHitFlag[GaggleIndex]);
+    }
+    RefBitsEn(BlockInfo, PtrCoding);
 
    //
    // nkeffix : Implement StageStop in 122x0b1c3 section 4.2.3.1 Table 4-5
@@ -647,8 +644,10 @@ void StagesEnCoding(StructCodingPara *PtrCoding,
       //
       // Clear Symbols
       //
-      for (SymbolIndex = 0; SymbolIndex < MAX_SYMBOLS_IN_BLOCK; SymbolIndex++)
-         BitPlaneSymbolReset(&(BlockInfo[BlockStartIndex].SymbolsBlock[SymbolIndex])) ;
+      for (j = 0; j < MAX_SYMBOLS_IN_BLOCK; j++)
+      {
+         BitPlaneSymbolReset(&(BlockInfo[BlockStartIndex].SymbolsBlock[j])) ;
+      }
 
       //
       // Clear refinement
@@ -659,7 +658,7 @@ void StagesEnCoding(StructCodingPara *PtrCoding,
       BlockInfo[BlockStartIndex].RefineBits.RefineChildren.ChildrenRefSymbol = 0;
       BlockInfo[BlockStartIndex].RefineBits.RefineChildren.ChildrenSymbolLength = 0;
 
-      for( j = 0; j < 3; j ++)
+      for(j = 0; j < 3; j++)
       {
          BlockInfo[BlockStartIndex].RefineBits.RefineGrandChildren[j].GrandChildrenRefSymbol = 0;
          BlockInfo[BlockStartIndex].RefineBits.RefineGrandChildren[j].GrandChildrenSymbolLength = 0;
@@ -670,20 +669,20 @@ void StagesEnCoding(StructCodingPara *PtrCoding,
 }
 extern void StagesDeCodingGaggles1(StructCodingPara *PtrCoding,
                      BitPlaneBits *BlockCodingInfo,
-                     uint8_t BlocksInGaggles,
+                     int BlocksInGaggles,
                      uint8_t *CodeOptionsAllGaggles,
                      BOOL *FlagCodeOptionOutput);
 
 
 extern void StagesDeCodingGaggles2(StructCodingPara *PtrCoding,
                      BitPlaneBits *BlockCodingInfo,
-                     uint8_t BlocksInGaggles,
+                     int BlocksInGaggles,
                      uint8_t *CodeOptionsAllGaggles,
                      BOOL *FlagCodeOptionOutput);
 
 extern void StagesDeCodingGaggles3(StructCodingPara *PtrCoding,
                      BitPlaneBits *BlockCodingInfo,
-                     uint8_t BlocksInGaggles,
+                     int BlocksInGaggles,
                      uint8_t *CodeOptionsAllGaggles,
                      BOOL *FlagCodeOptionOutput);
 
@@ -691,36 +690,35 @@ void StagesDeCoding(StructCodingPara *PtrCoding,
                BitPlaneBits *BlockInfo)
 {
    // try various options for the 2-bit, 3-bit, and 4 bit coding.
-   uint8_t BlocksInLastGaggle = 0;
-   uint32_t TotalGaggles;
-   uint32_t GaggleIndex = 0;
+   int TotalGaggles;
+   int GaggleIndex;
    uint8_t **CodeOptionsAllGaggles;
-   uint8_t BlocksInGaggle = 0;
-   uint32_t BlockStartIndex = 0;
+   int BlocksInGaggle;
+   int BlockStartIndex;
    BOOL **OptionHitFlag;
 
-   BlocksInLastGaggle = (uint8_t) (PtrCoding->PtrHeader->Header.Part3.S_20Bits % GAGGLE_SIZE) ;
    TotalGaggles = PtrCoding->PtrHeader->Header.Part3.S_20Bits / GAGGLE_SIZE;
+   if (PtrCoding->PtrHeader->Header.Part3.S_20Bits % GAGGLE_SIZE) TotalGaggles++;
    // bit length is equal to 1, nk = 0;
-   if( BlocksInLastGaggle!= 0)
-      TotalGaggles++;
+
    CodeOptionsAllGaggles = (uint8_t **)calloc(TotalGaggles, sizeof(uint8_t *)) ;
    OptionHitFlag = (BOOL **) calloc(TotalGaggles, sizeof(BOOL *)) ;
    PtrCoding->DecodingStopLocations.BlockNoStopDecoding = 0;
 
    // 4.1 Pattern values.
-   for (GaggleIndex = 0; GaggleIndex < TotalGaggles; GaggleIndex ++)
+   for (GaggleIndex = 0; GaggleIndex < TotalGaggles; GaggleIndex++)
    {
-      BlockStartIndex = GaggleIndex * GAGGLE_SIZE;
       CodeOptionsAllGaggles[GaggleIndex] = (uint8_t *)calloc(3, sizeof(uint8_t)) ;
       OptionHitFlag[GaggleIndex] =  (BOOL *)calloc(3, sizeof(BOOL)) ;
       OptionHitFlag[GaggleIndex][0] = FALSE;
       OptionHitFlag[GaggleIndex][1] = FALSE;
       OptionHitFlag[GaggleIndex][2] = FALSE;
-      BlocksInGaggle = (uint8_t)((BlockStartIndex + GAGGLE_SIZE < PtrCoding->PtrHeader->Header.Part3.S_20Bits) ?
-                   GAGGLE_SIZE : (PtrCoding->PtrHeader->Header.Part3.S_20Bits - BlockStartIndex)) ;
-      StagesDeCodingGaggles1(PtrCoding, &(BlockInfo[BlockStartIndex]) ,
-         BlocksInGaggle, (CodeOptionsAllGaggles[GaggleIndex]), OptionHitFlag[GaggleIndex] );
+      BlockStartIndex = GaggleIndex * GAGGLE_SIZE;
+      BlocksInGaggle  = ((BlockStartIndex + GAGGLE_SIZE) < PtrCoding->PtrHeader->Header.Part3.S_20Bits)
+                      ? GAGGLE_SIZE : PtrCoding->PtrHeader->Header.Part3.S_20Bits - BlockStartIndex;
+
+      StagesDeCodingGaggles1(PtrCoding, &(BlockInfo[BlockStartIndex]),
+         BlocksInGaggle, CodeOptionsAllGaggles[GaggleIndex], OptionHitFlag[GaggleIndex]);
 
       if ((PtrCoding->DecodingStopLocations.BitPlaneStopDecoding != -1)
          && PtrCoding->RateReached == TRUE)
@@ -730,13 +728,15 @@ void StagesDeCoding(StructCodingPara *PtrCoding,
          return;
       }
    }
-   for (GaggleIndex = 0; GaggleIndex < TotalGaggles; GaggleIndex ++)
+
+   for (GaggleIndex = 0; GaggleIndex < TotalGaggles; GaggleIndex++)
    {
       BlockStartIndex = GaggleIndex * GAGGLE_SIZE;
-      BlocksInGaggle = (uint8_t) ((BlockStartIndex + GAGGLE_SIZE < PtrCoding->PtrHeader->Header.Part3.S_20Bits) ?
-                     GAGGLE_SIZE : (PtrCoding->PtrHeader->Header.Part3.S_20Bits - BlockStartIndex))  ;
-      StagesDeCodingGaggles2(PtrCoding, &(BlockInfo[BlockStartIndex]) ,
-         BlocksInGaggle, (CodeOptionsAllGaggles[GaggleIndex]), OptionHitFlag[GaggleIndex] );
+      BlocksInGaggle  = ((BlockStartIndex + GAGGLE_SIZE) < PtrCoding->PtrHeader->Header.Part3.S_20Bits)
+                      ? GAGGLE_SIZE : PtrCoding->PtrHeader->Header.Part3.S_20Bits - BlockStartIndex;
+
+      StagesDeCodingGaggles2(PtrCoding, &(BlockInfo[BlockStartIndex]),
+         BlocksInGaggle, CodeOptionsAllGaggles[GaggleIndex], OptionHitFlag[GaggleIndex]);
 
       if ((PtrCoding->DecodingStopLocations.BitPlaneStopDecoding != -1)
          && PtrCoding->RateReached == TRUE)
@@ -753,14 +753,14 @@ void StagesDeCoding(StructCodingPara *PtrCoding,
       return;
    }
 
-   for (GaggleIndex = 0; GaggleIndex < TotalGaggles; GaggleIndex ++)
+   for (GaggleIndex = 0; GaggleIndex < TotalGaggles; GaggleIndex++)
    {
       BlockStartIndex = GaggleIndex * GAGGLE_SIZE;
-      BlocksInGaggle = (uint8_t) ((BlockStartIndex + GAGGLE_SIZE < PtrCoding->PtrHeader->Header.Part3.S_20Bits) ?
-                     GAGGLE_SIZE : (PtrCoding->PtrHeader->Header.Part3.S_20Bits - BlockStartIndex)) ;
+      BlocksInGaggle  = ((BlockStartIndex + GAGGLE_SIZE) < PtrCoding->PtrHeader->Header.Part3.S_20Bits)
+                      ? GAGGLE_SIZE : PtrCoding->PtrHeader->Header.Part3.S_20Bits - BlockStartIndex;
 
-      StagesDeCodingGaggles3(PtrCoding, &(BlockInfo[BlockStartIndex]) ,
-         BlocksInGaggle, (CodeOptionsAllGaggles[GaggleIndex]), OptionHitFlag[GaggleIndex] );
+      StagesDeCodingGaggles3(PtrCoding, &(BlockInfo[BlockStartIndex]),
+         BlocksInGaggle, CodeOptionsAllGaggles[GaggleIndex], OptionHitFlag[GaggleIndex]);
 
       if ((PtrCoding->DecodingStopLocations.BitPlaneStopDecoding != -1)
          && PtrCoding->RateReached == TRUE)
@@ -771,14 +771,14 @@ void StagesDeCoding(StructCodingPara *PtrCoding,
       }
    }
 
-   if( PtrCoding->RateReached == TRUE)
+   if (PtrCoding->RateReached == TRUE)
    {
       PtrCoding->DecodingStopLocations.stoppedstage = 3;
       return;
    }
    RefBitsDe(PtrCoding, BlockInfo);
 
-   if( PtrCoding->RateReached == TRUE)
+   if (PtrCoding->RateReached == TRUE)
    {
       PtrCoding->DecodingStopLocations.stoppedstage = 4;
       return;

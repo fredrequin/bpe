@@ -120,7 +120,7 @@ void HeaderInilization(StructCodingPara *Ptr)
       Ptr->Bits->CodeWord_Length = 32;
 
    // nkeffix
-   Ptr->altStrageStop = FALSE;
+   Ptr->altStageStop = FALSE;
 
    return;
 }

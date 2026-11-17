@@ -41,8 +41,8 @@ void ACGaggleEncoding(StructCodingPara *PtrCoding,
    int k = 0;
    int min_k = 0;
 
-   uint32_t min_bits = 0xFFFF;
-   uint32_t total_bits = 0;
+   int min_bits   = 65536;
+   int total_bits = 0;
 
    /* --- Begin bug fix (Kiely) --- */
    uint8_t uncoded_flag = ~0;   // this is the flag indicating that uncoded option used
@@ -121,9 +121,7 @@ void ACGaggleEncoding(StructCodingPara *PtrCoding,
 
 
 
-void DPCM_ACMapper(BitPlaneBits *BlockInfo,
-               int size,
-               short N)
+void DPCM_ACMapper(BitPlaneBits *BlockInfo, int size, short N)
 {
    short *diff_AC;
    short theta = 0;
@@ -188,11 +186,11 @@ void ACDepthEncoder(StructCodingPara *PtrCoding,
 
    /* --- Begin bug fix (Kiely) --- */
    GaggleStartIndex = 0;
-   while( GaggleStartIndex < PtrCoding->PtrHeader->Header.Part3.S_20Bits ){
+   while (GaggleStartIndex < PtrCoding->PtrHeader->Header.Part3.S_20Bits)
+   {
       gaggles = min(GAGGLE_SIZE, PtrCoding->PtrHeader->Header.Part3.S_20Bits - GaggleStartIndex);
       ACGaggleEncoding(PtrCoding, BlockInfo, GaggleStartIndex, gaggles, Max_k, ID_Length);
-      if(PtrCoding->SegmentFull == TRUE)
-         return;
+      if (PtrCoding->SegmentFull == TRUE) return;
       GaggleStartIndex += gaggles;
    }
    /* --- End bug fix (Kiely) --- */
@@ -247,7 +245,7 @@ void ACBpeEncoding(StructCodingPara *PtrCoding,    BitPlaneBits *BlockInfo)
             )
          {
             // output the DC bits that have been shifted out
-            for(i = 0; i < PtrCoding->PtrHeader->Header.Part3.S_20Bits; i++)
+            for (i = 0; i < PtrCoding->PtrHeader->Header.Part3.S_20Bits; i++)
                BitsOutput(PtrCoding, ((BlockInfo[i].DCRemainder >> (BitPlane - 1)) & 0x01), 1);
          }
 
@@ -368,9 +366,7 @@ void ACGaggleDecoding(StructCodingPara *PtrCoding,
 
 
 
-void DPCM_ACDeMapper(BitPlaneBits *BlockCodingInfo, //uint8_t *ACmax_blocks,
-                int size,
-                short N)
+void DPCM_ACDeMapper(BitPlaneBits *BlockCodingInfo, int size, short N)
 {
    short * diff_AC;
    short theta = 0;
@@ -448,7 +444,8 @@ short ACDepthDecoder(StructCodingPara *PtrCoding,
 
 
    /* --- Begin bug fix (Kiely) --- */
-   while( GaggleStartIndex < PtrCoding->PtrHeader->Header.Part3.S_20Bits ){
+   while (GaggleStartIndex < PtrCoding->PtrHeader->Header.Part3.S_20Bits )
+   {
       gaggles = min(GAGGLE_SIZE, PtrCoding->PtrHeader->Header.Part3.S_20Bits - GaggleStartIndex);
       ACGaggleDecoding(PtrCoding, BlockInfo, GaggleStartIndex, gaggles, Max_k, ID_Length);
       GaggleStartIndex += gaggles;
@@ -465,7 +462,6 @@ void  ACBpeDecoding(StructCodingPara *PtrCoding,
                 BitPlaneBits *BlockCodingInfo)
 {
    int i = 0;
-   uint32_t TempWord = 0;
    uint8_t BitPlane = 0;
 
    ///////////  3. Organize the AC component/////////////////////////////
@@ -476,9 +472,9 @@ void  ACBpeDecoding(StructCodingPara *PtrCoding,
    {
       if (PtrCoding->PtrHeader->Header.Part1.BitDepthAC_5Bits == 1)
       { //only the lowest bit plane has valud AC component manitude.
-         uint32_t TempWord;
-         for ( i = 0; i < PtrCoding->PtrHeader->Header.Part3.S_20Bits; i++)
+         for (i = 0; i < PtrCoding->PtrHeader->Header.Part3.S_20Bits; i++)
          {
+            uint32_t TempWord;
             BitsRead(PtrCoding, &TempWord, 1);
             BlockCodingInfo[i].BitMaxAC = (uint8_t)TempWord;
          }
@@ -491,14 +487,14 @@ void  ACBpeDecoding(StructCodingPara *PtrCoding,
 
    // 3.2 Family tree scaning sequence in a segment.
 
-   for ( BitPlane = PtrCoding->PtrHeader->Header.Part1.BitDepthAC_5Bits; BitPlane > 0; BitPlane --)
+   for (BitPlane = PtrCoding->PtrHeader->Header.Part1.BitDepthAC_5Bits; BitPlane > 0; BitPlane --)
    {
       // nkeffix : No need to check again BitPlaneStop_5Bits is either the default value 0 or
       //           or the specified value in the header
-      if(PtrCoding->PtrHeader->Header.Part2.BitPlaneStop_5Bits == BitPlane)
+      if (PtrCoding->PtrHeader->Header.Part2.BitPlaneStop_5Bits == BitPlane)
          return;
 
-      if(PtrCoding->SegmentFull == TRUE ||  PtrCoding->RateReached == TRUE)
+      if (PtrCoding->SegmentFull == TRUE ||  PtrCoding->RateReached == TRUE)
          return;
 
       PtrCoding->BitPlane = BitPlane;
@@ -512,10 +508,10 @@ void  ACBpeDecoding(StructCodingPara *PtrCoding,
          )
       {
          // read DC bits that have been shifted out
-         for(i = 0; i < PtrCoding->PtrHeader->Header.Part3.S_20Bits; i++)
+         for (i = 0; i < PtrCoding->PtrHeader->Header.Part3.S_20Bits; i++)
          {
-            if(PtrCoding->SegmentFull == TRUE)
-               break;
+            uint32_t TempWord;
+            if (PtrCoding->SegmentFull == TRUE) break;
             BitsRead(PtrCoding, &TempWord, 1);
             BlockCodingInfo[i].DecodingDCRemainder += (uint16_t)(TempWord << (BitPlane - 1)) ;
          }

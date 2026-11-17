@@ -191,7 +191,7 @@ short ImageRead(StructCodingPara *StrPtr,
          temp = (uint8_t *)calloc(sizeof(uint8_t), StrPtr->ImageWidth);
          for(r = 0; r < StrPtr->ImageRows;  r++)
          {
-            fread(temp, StrPtr->ImageWidth, sizeof(char),infile);
+            (void)fread(temp, StrPtr->ImageWidth, sizeof(char),infile);
             for(i = 0; i < StrPtr->ImageWidth; i++)
                image[r][i] = temp[i];
          }
@@ -203,7 +203,7 @@ short ImageRead(StructCodingPara *StrPtr,
          temp = (char *)calloc(sizeof(char), StrPtr->ImageWidth);
          for(r = 0; r < StrPtr->ImageRows;  r++)
          {
-            fread(temp, StrPtr->ImageWidth, sizeof(char),infile);
+            (void)fread(temp, StrPtr->ImageWidth, sizeof(char),infile);
             for(i = 0; i < StrPtr->ImageWidth; i++)
                image[r][i] = temp[i];
          }
@@ -219,7 +219,7 @@ short ImageRead(StructCodingPara *StrPtr,
          temp_16 = (uint16_t *)calloc(sizeof(uint16_t), StrPtr->ImageWidth);
          for(r=0; r<StrPtr->ImageRows; r++)
          {
-            fread(temp_16, StrPtr->ImageWidth, sizeof(short),infile);
+            (void)fread(temp_16, StrPtr->ImageWidth, sizeof(short),infile);
             for(i = 0; i <  StrPtr->ImageWidth; i++)
             {
                //image[r][i] = ((temp_16[i] & 0x00FF) << 8) + ((temp_16[i] & 0xFF00) >> 8);
@@ -235,7 +235,7 @@ short ImageRead(StructCodingPara *StrPtr,
          temp_16 = (short *)calloc(sizeof(short), StrPtr->ImageWidth);
          for(r=0; r<StrPtr->ImageRows; r++)
          {
-            fread(temp_16, StrPtr->ImageWidth, sizeof(short),infile);
+            (void)fread(temp_16, StrPtr->ImageWidth, sizeof(short),infile);
             for(i = 0; i <  StrPtr->ImageWidth; i++)
                image[r][i] = temp_16[i];
          }
@@ -441,11 +441,11 @@ void EncoderEngine(StructCodingPara * PtrCoding)
            // nkeffix : set SegByteLimit_27Bits to maxmimum value if BitsPerPixel is not set.
             if (PtrCoding->BitsPerPixel != 0)
             {
-            PtrCoding->PtrHeader->Header.Part2.SegByteLimit_27Bits = PtrCoding->BitsPerPixel * PtrCoding->PtrHeader->Header.Part3.S_20Bits * 64/8;
+               PtrCoding->PtrHeader->Header.Part2.SegByteLimit_27Bits = PtrCoding->BitsPerPixel * PtrCoding->PtrHeader->Header.Part3.S_20Bits * 64/8;
             }
             else
             {
-               PtrCoding->PtrHeader->Header.Part2.SegByteLimit_27Bits = MAX_SEGMENT_SIZE;
+               PtrCoding->PtrHeader->Header.Part2.SegByteLimit_27Bits = BYTE_SEGMENT_SIZE;
             }
       }
 

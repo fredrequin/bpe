@@ -197,7 +197,7 @@ int main(int argc, char **argv)
          break;
       case 's':
          strcpy(StringBuffer, optarg);
-         PtrCoding->PtrHeader->Header.Part3.S_20Bits  = atoi(StringBuffer);
+         PtrCoding->PtrHeader->Header.Part3.S_20Bits  = atoi(StringBuffer) & BLOCK_SEGMENT_MASK;
          break;
       // nkeffix : add support for OptDCSelect, OptACSelect, DCStop, StageStop and BitplaneStop
       //           according to 122x0b1c3 in sections 4.2.3 and 4.2.4
@@ -215,15 +215,15 @@ int main(int argc, char **argv)
          break;
       case 'n':   // Set Stage Stop
          strcpy(StringBuffer, optarg);
-         PtrCoding->PtrHeader->Header.Part2.StageStop_2Bits = atoi(StringBuffer);
+         PtrCoding->PtrHeader->Header.Part2.StageStop_2Bits = atoi(StringBuffer) & 0x3;
          break;
       case 'p':   // Set Bitplane Stop
          strcpy(StringBuffer, optarg);
-         PtrCoding->PtrHeader->Header.Part2.BitPlaneStop_5Bits = atoi(StringBuffer);
+         PtrCoding->PtrHeader->Header.Part2.BitPlaneStop_5Bits = atoi(StringBuffer) & 0x1F;
          break;
       case 'a':   // Set alternative Stage Stop mode
          strcpy(StringBuffer, optarg);
-         PtrCoding->altStrageStop = atoi(StringBuffer);
+         PtrCoding->altStageStop = atoi(StringBuffer);
          break;
       default:
          Usage();
@@ -280,11 +280,11 @@ int main(int argc, char **argv)
       // nkeffix : set SegByteLimit_27Bits to maxmimum value if BitsPerPixel is not set.
       if((PtrCoding->BitsPerPixel != 0) && PtrCoding->PtrHeader->Header.Part2.SegByteLimit_27Bits == 0)
         {
-         PtrCoding->PtrHeader->Header.Part2.SegByteLimit_27Bits = PtrCoding->BitsPerPixel * PtrCoding->PtrHeader->Header.Part3.S_20Bits * 64/8;
+            PtrCoding->PtrHeader->Header.Part2.SegByteLimit_27Bits = PtrCoding->BitsPerPixel * PtrCoding->PtrHeader->Header.Part3.S_20Bits * 64/8;
         }
         else
         {
-            PtrCoding->PtrHeader->Header.Part2.SegByteLimit_27Bits = MAX_SEGMENT_SIZE;
+            PtrCoding->PtrHeader->Header.Part2.SegByteLimit_27Bits = BYTE_SEGMENT_SIZE;
         }
 
       // DebugInfo( "\tBegin to encode...\n");
