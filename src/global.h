@@ -170,13 +170,13 @@ typedef struct BLOCKBITSHIT
    float **PtrBlockAddressFloating;
 
    //Bit plane and block information.
-   uint8_t BitPlane : 5;
-   long BlockIndex : 20;
+   uint8_t  BitPlane : 5;
+   long     BlockIndex : 20;
    // DC and AC_max information
    uint32_t MappedDC;
-   uint32_t ShiftedDC;
+   int32_t  ShiftedDC;
    uint16_t DCRemainder;
-   float DecodingDCRemainder;
+   float    DecodingDCRemainder;
    uint16_t BitMaxAC;
    uint16_t MappedAC;
    // status information ( hit history)

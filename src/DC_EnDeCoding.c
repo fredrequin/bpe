@@ -688,7 +688,7 @@ short DCDeCoding(StructCodingPara *PtrCoding,  StructFreBlockString *StrBlocks, 
 
    if (PtrCoding->N ==1)
       for(i = 0; i < PtrCoding->PtrHeader->Header.Part3.S_20Bits; i ++) // shift the DC component to the right
-         BitsRead(PtrCoding, &BlockInfo[i].ShiftedDC, 1);
+         BitsRead(PtrCoding, (uint32_t *)&&BlockInfo[i].ShiftedDC, 1);
    else
    {
       if ((k = DCEntropyDecoder(PtrCoding, BlockInfo)) != BPE_OK)
@@ -723,8 +723,8 @@ short DCDeCoding(StructCodingPara *PtrCoding,  StructFreBlockString *StrBlocks, 
 
    for(i = 0; i <(uint32_t) PtrCoding->PtrHeader->Header.Part3.S_20Bits; i ++) {
       // shift the DC component to the right
-      BlockInfo[i].ShiftedDC <<= PtrCoding->QuantizationFactorQ;
-      *(*BlockInfo[i].PtrBlockAddress) = DeConvTwosComp(BlockInfo[i].ShiftedDC, PtrCoding->PtrHeader->Header.Part1.BitDepthDC_5Bits);
+      BlockInfo[i].ShiftedDC = (int32_t)((uint32_t)BlockInfo[i].ShiftedDC << PtrCoding->QuantizationFactorQ);
+      *(*BlockInfo[i].PtrBlockAddress) = DeConvTwosComp((uint32_t)BlockInfo[i].ShiftedDC, PtrCoding->PtrHeader->Header.Part1.BitDepthDC_5Bits);
    }
 
    return BPE_OK;
