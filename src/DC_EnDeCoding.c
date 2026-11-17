@@ -114,8 +114,8 @@ void DCEncoder(StructCodingPara *PtrCoding,
    int k = 0;
    int min_k = 0;
 
-   uint32_t min_bits = 0xFFFF;
-   uint32_t total_bits = 0;
+   int min_bits   = 65536;
+   int total_bits = 0;
 
    /* --- Begin bug fix (Kiely) --- */
    uint8_t uncoded_flag = ~0;   // this is the flag indicating that uncoded option used
@@ -222,8 +222,8 @@ void DCEntropyEncoder(StructCodingPara* PtrCoding,
 
    if(PtrCoding->PtrHeader->Header.Part1.BitDepthAC_5Bits < PtrCoding->QuantizationFactorQ)
    {
-      uint32_t i;
-      uint32_t k;
+      int i;
+      int k;
 
       /* --- Begin bug fix (Kiely) --- */
       int numaddbitplanes;
@@ -237,7 +237,7 @@ void DCEntropyEncoder(StructCodingPara* PtrCoding,
 
       // loop on each bit plane in order of decreasing significance
       for (i = 0; i < numaddbitplanes; i ++)
-         for( k = 0; k < PtrCoding->PtrHeader->Header.Part3.S_20Bits; k++)
+         for (k = 0; k < PtrCoding->PtrHeader->Header.Part3.S_20Bits; k++)
             BitsOutput(PtrCoding, BlockInfo[k].DCRemainder >>(PtrCoding->QuantizationFactorQ - i - 1), 1);
       /* --- End bug fix (Kiely) --- */
    }
@@ -387,7 +387,7 @@ void DPCM_DCMapper(BitPlaneBits *BlockInfo,
       else if(diff_DC[i] <0 && diff_DC[i] >= -theta)
          BlockInfo[i].MappedDC = - 2 * diff_DC[i] - 1;
       else
-         BlockInfo[i].MappedDC = theta + abs(diff_DC[i]);
+         BlockInfo[i].MappedDC = theta + labs(diff_DC[i]);
 
       if(BlockInfo[i].MappedDC > Max_Mapped)
          Max_Mapped = BlockInfo[i].MappedDC;
@@ -703,7 +703,7 @@ short DCDeCoding(StructCodingPara *PtrCoding,  StructFreBlockString *StrBlocks, 
 
    PtrCoding->N = PtrCoding->PtrHeader->Header.Part1.BitDepthDC_5Bits - PtrCoding->QuantizationFactorQ;
 
-   for (i = 0; i <(uint32_t) PtrCoding->PtrHeader->Header.Part3.S_20Bits; i++)
+   for (i = 0; i < PtrCoding->PtrHeader->Header.Part3.S_20Bits; i++)
    {
       // shift the DC component to the right
       BlockInfo[i].ShiftedDC = (int32_t)((uint32_t)BlockInfo[i].ShiftedDC << PtrCoding->QuantizationFactorQ);
