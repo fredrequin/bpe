@@ -19,7 +19,7 @@ Nov. 3, 2006
 #include <math.h>
 #include "global.h"
 
-extern long DeConvTwosComp(uint32_t complement, short leftmost);
+extern int64_t DeConvTwosComp(uint64_t complement, int leftmost);
 
 void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)// need to adjust the output
 {
@@ -38,14 +38,14 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
 
    if (PtrCoding->PtrHeader->Header.Part4.DWTType != INTEGER_WAVELET)
    {
-      for ( i = 0;  i < TotalBlocks; i ++)
+      for (i = 0; i < TotalBlocks; i++)
 
-         for ( m = 0; m < 8; m++)
-            for ( n = 0; n < 8; n ++)
+         for (m = 0; m < BLOCK_SIZE; m++)
+            for (n = 0; n < BLOCK_SIZE; n ++)
                BlockCodingInfo[i].PtrBlockAddressFloating[m][n] = (float) BlockCodingInfo[i].PtrBlockAddress[m][n] ;
 
    }
-   for ( i = 0;  i < TotalBlocks; i ++)
+   for (i = 0;  i < TotalBlocks; i++)
    {
       /* The following line is buggy: */
       /*
@@ -53,7 +53,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
          PtrCoding->PtrHeader->Header.Part1.BitDepthDC_5Bits);
       */
       /* Here's the bug fix (Aaron Kiely, June 25,2008) */
-      *(*BlockCodingInfo[i].PtrBlockAddress) = DeConvTwosComp((uint32_t)((long int)BlockCodingInfo[i].ShiftedDC + (long int)BlockCodingInfo[i].DecodingDCRemainder),
+      *(*BlockCodingInfo[i].PtrBlockAddress) = DeConvTwosComp((uint64_t)((int64_t)BlockCodingInfo[i].ShiftedDC + (int64_t)BlockCodingInfo[i].DecodingDCRemainder),
          PtrCoding->PtrHeader->Header.Part1.BitDepthDC_5Bits);
 
       *(*BlockCodingInfo[i].PtrBlockAddressFloating)  = (float) (*(*BlockCodingInfo[i].PtrBlockAddress));
@@ -77,7 +77,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                      // first adjust DC component.
          {
             if (b_DC >= 1)
-               for( i = 0; i < TotalBlocks; i ++)
+               for (i = 0; i < TotalBlocks; i ++)
                   *(*BlockCodingInfo[i].PtrBlockAddress) += (1 << (b_DC - 1));
 
             if(PtrCoding->DecodingStopLocations.BitPlaneStopDecoding >= 1)
@@ -94,7 +94,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
 
             if (PtrCoding->DecodingStopLocations.stoppedstage == 1) // only stopped at parents. using beta_2 for all children and grandchildren.
             {
-                for (i = 0; i < TotalBlocks; i ++)
+                for (i = 0; i < TotalBlocks; i++)
                 {
                   if (i < PtrCoding->DecodingStopLocations.BlockNoStopDecoding)
                   {
@@ -104,8 +104,8 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                   {
                      refinement = beta_2;
                   }
-                   for(m = 0; m < 8; m++)
-                      for(n = 0; n < 8; n++)
+                   for (m = 0; m < BLOCK_SIZE; m++)
+                      for (n = 0; n < BLOCK_SIZE; n++)
                       {
                          if ((m == 0 && n == 0) || (BlockCodingInfo[i].PtrBlockAddress[m][n] == 0))
                         continue;
@@ -218,10 +218,10 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
             else if (PtrCoding->DecodingStopLocations.stoppedstage == 2) // only stopped at children. using beta2 for all and grandchildren and beta 1
                // for all parents.
             {
-                for (i = 0; i < TotalBlocks; i ++)
+                for (i = 0; i < TotalBlocks; i++)
                 {
-                    for(m = 0; m < 8; m++)
-                      for(n = 0; n < 8; n++)
+                    for (m = 0; m < BLOCK_SIZE; m++)
+                      for (n = 0; n < BLOCK_SIZE; n++)
                       {
                          if ((m == 0 && n == 0) || (BlockCodingInfo[i].PtrBlockAddress[m][n] == 0))
                             continue;
@@ -499,10 +499,10 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
             }
             else if  (PtrCoding->DecodingStopLocations.stoppedstage == 3)// parents coding stage.
             {
-               for (i = 0; i < TotalBlocks; i ++)
+               for (i = 0; i < TotalBlocks; i++)
                 {
-                    for(m = 0; m < 8; m++)
-                      for(n = 0; n < 8; n++)
+                    for (m = 0; m < BLOCK_SIZE; m++)
+                      for (n = 0; n < BLOCK_SIZE; n++)
                       {
                          if ((m == 0 && n == 0) || (BlockCodingInfo[i].PtrBlockAddress[m][n] == 0))
                             continue;
@@ -1527,8 +1527,8 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
 
                   if (i <  PtrCoding->DecodingStopLocations.BlockNoStopDecoding)
                   {
-                     for(m = 0; m < 8; m++)
-                        for(n = 0; n < 8; n++)
+                     for (m = 0; m < BLOCK_SIZE; m++)
+                        for (n = 0; n < BLOCK_SIZE; n++)
                         {
                            if ((m == 0 && n == 0) || (BlockCodingInfo[i].PtrBlockAddress[m][n] == 0))
                               continue;
@@ -1549,8 +1549,8 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                   else if (i >  PtrCoding->DecodingStopLocations.BlockNoStopDecoding)
                   {
 
-                     for(m = 0; m < 8; m++)
-                        for(n = 0; n < 8; n++)
+                     for (m = 0; m < BLOCK_SIZE; m++)
+                        for (n = 0; n < BLOCK_SIZE; n++)
                         {
                            if ((m == 0 && n == 0) || (BlockCodingInfo[i].PtrBlockAddress[m][n] == 0))
                               continue;
@@ -1575,8 +1575,8 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                   }
                   else   // current block
                   {
-                     for(m = 0; m < 8; m++)
-                        for(n = 0; n < 8; n++)
+                     for (m = 0; m < BLOCK_SIZE; m++)
+                        for (n = 0; n < BLOCK_SIZE; n++)
                         {
                            if ((m == 0 && n == 0) || (BlockCodingInfo[i].PtrBlockAddress[m][n] == 0))
                               continue;
@@ -2849,7 +2849,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
             if (b_DC >= 1)
             {
                float temp = (float)((1 << (b_DC - 1))  - 0.5);
-               for( i = 0; i < TotalBlocks; i ++)
+               for (i = 0; i < TotalBlocks; i ++)
                     *(*BlockCodingInfo[i].PtrBlockAddressFloating) += temp;
             }
 
@@ -2876,8 +2876,8 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                   else  if (i >  PtrCoding->DecodingStopLocations.BlockNoStopDecoding)
                      refinement = beta_2;
 
-                   for(m = 0; m < 8; m++)
-                      for(n = 0; n < 8; n++)
+                   for (m = 0; m < BLOCK_SIZE; m++)
+                      for (n = 0; n < BLOCK_SIZE; n++)
                       {
                          if ((m == 0 && n == 0) || (BlockCodingInfo[i].PtrBlockAddress[m][n] == 0))
                         continue;
@@ -2990,10 +2990,10 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
             else if (PtrCoding->DecodingStopLocations.stoppedstage == 2) // only stopped at children. using beta2 for all and grandchildren and beta 1
                // for all parents.
             {
-                for (i = 0; i < TotalBlocks; i ++)
+                for (i = 0; i < TotalBlocks; i++)
                 {
-                    for(m = 0; m < 8; m++)
-                      for(n = 0; n < 8; n++)
+                    for (m = 0; m < BLOCK_SIZE; m++)
+                      for (n = 0; n < BLOCK_SIZE; n++)
                       {
                          if ((m == 0 && n == 0) || (BlockCodingInfo[i].PtrBlockAddress[m][n] == 0))
                             continue;
@@ -3274,10 +3274,10 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
             }
             else if  (PtrCoding->DecodingStopLocations.stoppedstage == 3)// parents coding stage.
             {
-               for (i = 0; i < TotalBlocks; i ++)
+               for (i = 0; i < TotalBlocks; i++)
                 {
-                    for(m = 0; m < 8; m++)
-                      for(n = 0; n < 8; n++)
+                    for (m = 0; m < BLOCK_SIZE; m++)
+                      for (n = 0; n < BLOCK_SIZE; n++)
                       {
                          if ((m == 0 && n == 0) || (BlockCodingInfo[i].PtrBlockAddress[m][n] == 0))
                             continue;
@@ -4289,7 +4289,7 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
             }
             else // refinement process
             {
-               for (i = 0; i < TotalBlocks; i ++)
+               for (i = 0; i < TotalBlocks; i++)
                {
                   if (i < PtrCoding->DecodingStopLocations.BlockNoStopDecoding)
                   {
@@ -4302,8 +4302,8 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
 
                   if (i <  PtrCoding->DecodingStopLocations.BlockNoStopDecoding)
                   {
-                     for(m = 0; m < 8; m++)
-                        for(n = 0; n < 8; n++)
+                     for (m = 0; m < BLOCK_SIZE; m++)
+                        for (n = 0; n < BLOCK_SIZE; n++)
                         {
                            if ((m == 0 && n == 0) || (BlockCodingInfo[i].PtrBlockAddress[m][n] == 0))
                               continue;
@@ -4324,8 +4324,8 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                   else if (i >  PtrCoding->DecodingStopLocations.BlockNoStopDecoding)
                   {
 
-                     for(m = 0; m < 8; m++)
-                        for(n = 0; n < 8; n++)
+                     for (m = 0; m < BLOCK_SIZE; m++)
+                        for (n = 0; n < BLOCK_SIZE; n++)
                         {
                            if ((m == 0 && n == 0) || (BlockCodingInfo[i].PtrBlockAddress[m][n] == 0))
                               continue;
@@ -4350,8 +4350,8 @@ void AdjustOutPut(StructCodingPara * PtrCoding, BitPlaneBits * BlockCodingInfo)/
                   }
                   else   // current block
                   {
-                     for(m = 0; m < 8; m++)
-                        for(n = 0; n < 8; n++)
+                     for (m = 0; m < BLOCK_SIZE; m++)
+                        for (n = 0; n < BLOCK_SIZE; n++)
                         {
                            if ((m == 0 && n == 0) || (BlockCodingInfo[i].PtrBlockAddress[m][n] == 0))
                               continue;

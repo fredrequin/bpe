@@ -52,7 +52,7 @@ void ACGaggleEncoding(StructCodingPara *PtrCoding,
     if(PtrCoding->PtrHeader->Header.Part3.OptACSelect == TRUE) {  // brute-force optimum code selection
       min_k = uncoded_flag;   // uncoded option used, unless we find a better option below
 
-      for ( k = 0; k <= Max_k; k ++)
+      for (k = 0; k <= Max_k; k++)
       {
          if (StartIndex==0)
             total_bits = PtrCoding->N;   // cost of uncoded first sample
@@ -67,9 +67,11 @@ void ACGaggleEncoding(StructCodingPara *PtrCoding,
             min_k = k;
          }
       }
-   } else {  // heuristic code option selection
-      int delta = 0;
-      int J = gaggles;
+   }
+   else
+   {  // heuristic code option selection
+      int64_t delta = 0;
+      int64_t J = gaggles;
       int offset = 0;
 
       if (StartIndex==0)
@@ -84,15 +86,15 @@ void ACGaggleEncoding(StructCodingPara *PtrCoding,
       for (i = StartIndex + offset; i < StartIndex + gaggles; i ++)
          delta += BlockInfo[i].MappedAC;
 
-      if (64*delta >= 23*J*(1<<(PtrCoding->N)))
+      if ((64 * delta) >= (23 * J << PtrCoding->N))
           min_k = uncoded_flag;   // indicate that uncoded option is to be used
       else if (207 * J > 128 * delta)
          min_k = 0;
-      else if ((long)(J * (1<<(PtrCoding->N + 5))) <= (long)(128 * delta + 49 * J))
+      else if ((J << (PtrCoding->N + 5)) <= (128 * delta + 49 * J))
          min_k = PtrCoding->N - 2;
       else {
          min_k = 0;
-         while ((long)(J * (1 << (min_k + 7))) <= (long)(128 * delta + 49 * J))
+         while ((J << (min_k + 7)) <= (128 * delta + 49 * J))
             min_k++;
          min_k--;
       }
@@ -125,7 +127,7 @@ void DPCM_ACMapper(BitPlaneBits *BlockInfo,
 {
    short *diff_AC;
    short theta = 0;
-   long i;
+   int i;
    int X_Min = 0;
    int X_Max = ((1 << N) - 1) ;
 
@@ -135,7 +137,8 @@ void DPCM_ACMapper(BitPlaneBits *BlockInfo,
    for(i = 1; i < size; i ++)
       diff_AC[i] = BlockInfo[i].BitMaxAC - BlockInfo[i-1].BitMaxAC;
 
-   for ( i = 1; i < size; i ++) {
+   for ( i = 1; i < size; i ++)
+   {
       theta = min(BlockInfo[i-1].BitMaxAC - X_Min, X_Max - BlockInfo[i-1].BitMaxAC);
       if (diff_AC[i] >= 0 && diff_AC[i] <= theta)
          BlockInfo[i].MappedAC = 2 * diff_AC[i];
@@ -201,7 +204,7 @@ void ACDepthEncoder(StructCodingPara *PtrCoding,
 
 void ACBpeEncoding(StructCodingPara *PtrCoding,    BitPlaneBits *BlockInfo)
 {
-   uint32_t i = 0;
+   int i = 0;
    uint8_t BitPlane = 0;
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -303,7 +306,7 @@ void ACGaggleDecoding(StructCodingPara *PtrCoding,
                      int Max_k,
                      short ID_Length)
 {
-   long int i;
+   int i;
    uint8_t min_k;
    uint32_t TempWord =0;
    int counter = 0;
@@ -322,7 +325,8 @@ void ACGaggleDecoding(StructCodingPara *PtrCoding,
       uncoded = TRUE;
 
    /* --- Begin bug fix (Kiely) --- */
-   for( i = StartIndex; i < StartIndex + gaggles; i ++){
+   for (i = StartIndex; i < StartIndex + gaggles; i ++)
+   {
        if ((uncoded == TRUE)||(i==0)){  // if first value in segment, then it's an uncoded reference
          BitsRead(PtrCoding, &TempWord, PtrCoding->N);
          BlockInfo[i].MappedAC = (uint16_t) TempWord;
@@ -370,7 +374,7 @@ void DPCM_ACDeMapper(BitPlaneBits *BlockCodingInfo, //uint8_t *ACmax_blocks,
 {
    short * diff_AC;
    short theta = 0;
-   long i;
+   int i;
    int X_Min = 0;
    int X_Max = ((1 << N) - 1) ;
 
@@ -378,7 +382,7 @@ void DPCM_ACDeMapper(BitPlaneBits *BlockCodingInfo, //uint8_t *ACmax_blocks,
 
    BlockCodingInfo[0].BitMaxAC = (uint8_t)BlockCodingInfo[0].MappedAC;
 
-   for ( i = 1; i < size; i ++)
+   for (i = 1; i < size; i++)
    {
       theta = min(BlockCodingInfo[i-1].BitMaxAC  - X_Min, X_Max - BlockCodingInfo[i-1].BitMaxAC );
       if((float)BlockCodingInfo[i].MappedAC / 2 == BlockCodingInfo[i].MappedAC / 2)
@@ -460,7 +464,7 @@ short ACDepthDecoder(StructCodingPara *PtrCoding,
 void  ACBpeDecoding(StructCodingPara *PtrCoding,
                 BitPlaneBits *BlockCodingInfo)
 {
-   uint32_t i = 0;
+   int i = 0;
    uint32_t TempWord = 0;
    uint8_t BitPlane = 0;
 
@@ -523,4 +527,3 @@ void  ACBpeDecoding(StructCodingPara *PtrCoding,
    CheckUsefill(PtrCoding);
    return;
 }
-
