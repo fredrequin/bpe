@@ -633,7 +633,7 @@ void DPCM_DCDeMapper(BitPlaneBits *BlockInfo,
          else
             diff_DC[i] = theta - BlockInfo[i].MappedDC;
       } else {
-         if((float)BlockInfo[i].MappedDC / 2 == BlockInfo[i].MappedDC / 2)
+         if ((float)BlockInfo[i].MappedDC / 2 == BlockInfo[i].MappedDC / 2)
             diff_DC[i] = BlockInfo[i].MappedDC / 2;
          else
             diff_DC[i] = -(long)(BlockInfo[i].MappedDC + 1) / 2 ;
@@ -688,7 +688,7 @@ short DCDeCoding(StructCodingPara *PtrCoding,  StructFreBlockString *StrBlocks, 
 
    if (PtrCoding->N ==1)
       for(i = 0; i < PtrCoding->PtrHeader->Header.Part3.S_20Bits; i ++) // shift the DC component to the right
-         BitsRead(PtrCoding, (uint32_t *)&&BlockInfo[i].ShiftedDC, 1);
+         BitsRead(PtrCoding, (uint32_t *)&BlockInfo[i].ShiftedDC, 1);
    else
    {
       if ((k = DCEntropyDecoder(PtrCoding, BlockInfo)) != BPE_OK)
