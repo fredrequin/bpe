@@ -19,46 +19,18 @@ Nov. 3, 2006
 
 void OutputCodeWord(StructCodingPara * Ptr)
 {
-
    Ptr->Bits->CodeWordAlighmentBits ++;
    Ptr->Bits->SegBitCounter++;
    Ptr->Bits->TotalBitCounter ++;
 
-   if ( Ptr->Bits->CodeWordAlighmentBits == Ptr->Bits->CodeWord_Length)
+   if (Ptr->Bits->CodeWordAlighmentBits == Ptr->Bits->CodeWord_Length)
    {
-      if(Ptr->Bits->CodeWord_Length == 8)
-      {
-         uint8_t temp;
-/*         if( Ptr->Bits->TotalBitCounter  >= 8 * 0x5)
-         Ptr->Bits->TotalBitCounter  = Ptr->Bits->TotalBitCounter ;
-*/
-         temp = (uint8_t)Ptr->Bits->ByteBuffer_4Bytes;
-         putc(temp, Ptr->Bits->F_Bits);
+      /* MSB first, not machine dependant */
+      uint32_t n;
 
-      }
-      else if(Ptr->Bits->CodeWord_Length == 16)
+      for (n = Ptr->Bits->CodeWord_Length; n > 0; n -= 8)
       {
-         uint16_t temp;
-         temp = (uint16_t)Ptr->Bits->ByteBuffer_4Bytes;
-         fwrite(&temp, 1, sizeof(uint16_t), Ptr->Bits->F_Bits);
-      }
-      else if(Ptr->Bits->CodeWord_Length == 24)
-      {
-         uint16_t temp;
-         temp = (uint16_t)Ptr->Bits->ByteBuffer_4Bytes & 0xFF;
-         putc(temp, Ptr->Bits->F_Bits);
-
-         temp = (uint16_t)Ptr->Bits->ByteBuffer_4Bytes & 0xFF00;
-         putc(temp, Ptr->Bits->F_Bits);
-
-         temp = (uint16_t)Ptr->Bits->ByteBuffer_4Bytes & 0xFF0000;
-         putc(temp, Ptr->Bits->F_Bits);
-      }
-      else if(Ptr->Bits->CodeWord_Length == 32)
-      {
-         uint32_t temp;
-         temp = (uint32_t)Ptr->Bits->ByteBuffer_4Bytes;
-         fwrite(&temp, 1, sizeof(uint32_t), Ptr->Bits->F_Bits);
+         putc((uint8_t)(Ptr->Bits->ByteBuffer_4Bytes >> (n - 8)), Ptr->Bits->F_Bits);
       }
       Ptr->Bits->CodeWordAlighmentBits = 0;
    }
@@ -106,8 +78,8 @@ void BitsOutput(StructCodingPara *Ptr,
       }
    }
 
-// determine the Codeword length by the hearder part 4.
-   if(length > 32)
+// determine the Codeword length by the header part 4.
+   if (length > 32)
    {
       int tt = length - 32;
 
