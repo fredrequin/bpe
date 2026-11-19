@@ -20,10 +20,6 @@ Nov. 3, 2006
 
 extern void HeaderOutput(StructCodingPara *PtrCoding);
 
-#ifndef INT64_WIDTH
-#define INT64_WIDTH (64)
-#endif /* INT64_WIDTH */
-
 int64_t DeConvTwosComp(uint64_t complement, int leftmost)
 {
 /*   To determine the integer value of a 2's complement code

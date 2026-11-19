@@ -85,7 +85,7 @@ BOOL ParameterValidCheck(StructCodingPara *PtrCoding)
       if (PtrCoding->PtrHeader->Header.Part3.S_20Bits  < SEGMENT_S_MIN)
          return FALSE;
 
-      if((PtrCoding->BitsPerPixel  < 0) || (PtrCoding->BitsPerPixel  >16))
+      if (PtrCoding->BitsPerPixel == UINT16_MAX)
          return FALSE;
 
    return TRUE;
@@ -98,7 +98,7 @@ BOOL ParameterValidCheck(StructCodingPara *PtrCoding)
 
 int main(int argc, char **argv)
 {
-    clock_t tStart = clock();
+   clock_t tStart = clock();
    extern char *optarg;
    char i = 0;
    long TotalPixels = 0;
@@ -126,7 +126,7 @@ int main(int argc, char **argv)
    fprintf(stderr, "Demo mode:\n\t Input image: sinan.img, \n\t Bitrate = 1.0, \n\t Segment = 1024; \n\t Transform: Int97\n");
    strcpy(PtrCoding->InputFile, "sinan.img");
    BoolEnCoder = TRUE;
-   PtrCoding->BitsPerPixel = 1;
+   PtrCoding->BitsPerPixel = 64; // 1.0
    PtrCoding->ImageRows = 256;
    PtrCoding->ImageWidth = 256;
    PtrCoding->PtrHeader->Header.Part3.S_20Bits = 1024;
@@ -160,9 +160,22 @@ int main(int argc, char **argv)
          strcpy(PtrCoding->CodingOutputFile,optarg);
          break;
       case 'r':   // coding BitsPerPixel, bits per pixels
+      {
+         double tmp;
          strcpy(StringBuffer,optarg);
-         PtrCoding->BitsPerPixel = (float)atof(StringBuffer);
+         tmp = atof(StringBuffer) * 64.0;
+         if ((tmp < 0.0) || (tmp > 1024.0))
+         {
+            // Outside allowed range
+            PtrCoding->BitsPerPixel = (uint16_t)UINT16_MAX;
+         }
+         else
+         {
+            // Range OK [0..16]
+            PtrCoding->BitsPerPixel = (uint16_t)tmp;
+         }
          break;
+      }
       case 'h':  // row size
          strcpy(StringBuffer, optarg);
          PtrCoding->ImageRows = atoi(StringBuffer);
@@ -280,11 +293,11 @@ int main(int argc, char **argv)
       // nkeffix : set SegByteLimit_27Bits to maxmimum value if BitsPerPixel is not set.
       if((PtrCoding->BitsPerPixel != 0) && PtrCoding->PtrHeader->Header.Part2.SegByteLimit_27Bits == 0)
         {
-            PtrCoding->PtrHeader->Header.Part2.SegByteLimit_27Bits = PtrCoding->BitsPerPixel * PtrCoding->PtrHeader->Header.Part3.S_20Bits * 64/8;
+            PtrCoding->PtrHeader->Header.Part2.SegByteLimit_27Bits = PtrCoding->PtrHeader->Header.Part3.S_20Bits * PtrCoding->BitsPerPixel / 8;
         }
         else
         {
-            PtrCoding->PtrHeader->Header.Part2.SegByteLimit_27Bits = BYTE_SEGMENT_SIZE;
+            PtrCoding->PtrHeader->Header.Part2.SegByteLimit_27Bits = BYTE_SEGMENT_SIZE - 1;
         }
 
       // DebugInfo( "\tBegin to encode...\n");
@@ -319,8 +332,7 @@ int main(int argc, char **argv)
       }
       */
 
-      if(PtrCoding->BitsPerPixel < 0)
-         ErrorMsg(BPE_INVALID_CODING_PARAMETERS);
+      if (PtrCoding->BitsPerPixel == UINT16_MAX) ErrorMsg(BPE_INVALID_CODING_PARAMETERS);
 
       // DebugInfo( "\tBegin to decode...\n");
       // record the decoding time.

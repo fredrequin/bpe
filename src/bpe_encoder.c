@@ -441,11 +441,19 @@ void EncoderEngine(StructCodingPara * PtrCoding)
            // nkeffix : set SegByteLimit_27Bits to maxmimum value if BitsPerPixel is not set.
             if (PtrCoding->BitsPerPixel != 0)
             {
-               PtrCoding->PtrHeader->Header.Part2.SegByteLimit_27Bits = PtrCoding->BitsPerPixel * PtrCoding->PtrHeader->Header.Part3.S_20Bits * 64/8;
+               int32_t limit = PtrCoding->PtrHeader->Header.Part3.S_20Bits * PtrCoding->BitsPerPixel / 8;
+               if (limit >= BYTE_SEGMENT_SIZE)
+               {
+                  PtrCoding->PtrHeader->Header.Part2.SegByteLimit_27Bits = BYTE_SEGMENT_SIZE - 1;
+               }
+               else
+               {
+                  PtrCoding->PtrHeader->Header.Part2.SegByteLimit_27Bits = limit;
+               }
             }
             else
             {
-               PtrCoding->PtrHeader->Header.Part2.SegByteLimit_27Bits = BYTE_SEGMENT_SIZE;
+               PtrCoding->PtrHeader->Header.Part2.SegByteLimit_27Bits = BYTE_SEGMENT_SIZE - 1;
             }
       }
 

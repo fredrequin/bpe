@@ -267,8 +267,7 @@ void HeaderReadin(StructCodingPara *PtrCoding)
       PtrCoding->PtrHeader->Header.Part3.S_20Bits = Byte;
       if(PtrCoding->BitsPerPixel != 0)
       {
-         PtrCoding->DecodingAllowedBitsSizeInSegment = (uint32_t)(PtrCoding->BitsPerPixel *
-               PtrCoding->PtrHeader->Header.Part3.S_20Bits * 64);
+         PtrCoding->DecodingAllowedBitsSizeInSegment = (uint32_t)(PtrCoding->PtrHeader->Header.Part3.S_20Bits * PtrCoding->BitsPerPixel);
 
          if (PtrCoding->DecodingAllowedBitsSizeInSegment > (PtrCoding->PtrHeader->Header.Part2.SegByteLimit_27Bits  << 3))
             PtrCoding->DecodingAllowedBitsSizeInSegment = (PtrCoding->PtrHeader->Header.Part2.SegByteLimit_27Bits << 3);

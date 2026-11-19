@@ -6,6 +6,14 @@ include this file*/
 #include <stdio.h>
 #include <stdint.h>
 
+#ifndef INT64_WIDTH
+#define INT64_WIDTH (64)
+#endif /* INT64_WIDTH */
+
+#ifndef UINT16_MAX
+#define UINT16_MAX (0xFFFF)
+#endif /* UINT16_MAX */
+
 //
 // Maximum Supported File path
 //
@@ -282,7 +290,7 @@ typedef struct CODINGPARAMETERS
 {
    BitStream *Bits;
    uint8_t BitPlane;
-   float BitsPerPixel;      // default coding BitsPerPixel, bits per pixels
+   uint16_t BitsPerPixel;      // default coding BitsPerPixel, bits per pixels * 64 (Q10.6)
    uint32_t DecodingAllowedBitsSizeInSegment;      // for decoding purpose.
    BOOL RateReached;
    StrStopLocation DecodingStopLocations;

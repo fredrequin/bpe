@@ -44,7 +44,7 @@ const char *BpeErrorMsg[] = {
 void DebugInfo(char *m)
 {
 #ifdef DEBUG
-   fprintf(stderr, m);
+   fputs(m, stderr);
 #endif
    return;
 }
