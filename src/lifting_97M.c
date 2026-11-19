@@ -23,8 +23,7 @@ Nov. 3, 2006
 
 static int *x_alloc = NULL;   //** temp work
 
-void forwardf97M(int *x_in,
-             int N)
+void forwardf97M(int *x_in, int N)
 {
    int i;
    int n;
@@ -34,7 +33,7 @@ void forwardf97M(int *x_in,
    int *d;
    int *temp_0;
    int *temp_1;
-   double temp;
+   int temp;
 
    x = x_alloc + F_EXTPAD;
    memcpy(x,x_in,sizeof(int)*N);
@@ -50,16 +49,9 @@ void forwardf97M(int *x_in,
 
    for (n=half + 1;n > 0; n--)
    {
-      temp = (-1.0/16 * (x[-4] + x[2]) + 9.0/16 * (x[-2] + x[0]) + 0.5);
-      if (temp > 0)
-         temp = (int)temp;
-      else
-      {
-         if (temp != (int)temp)
-            temp = (int)(temp - 1);
-      }
+      temp = (9 * (x[-2] + x[0]) - (x[-4] + x[2]) + 8) >> 4;
 
-      *d++ = x[-1] - (int)temp;
+      *d++ = x[-1] - temp;
       x += 2;
    }
    d = temp_0;
@@ -68,16 +60,9 @@ void forwardf97M(int *x_in,
    x = x_alloc + F_EXTPAD;
    for (n=half;n> 0; n--)
    {
-      temp = -.25 * (d[0] + d[1]) +.5;
-      if (temp > 0)
-         temp = (int)temp;
-      else
-      {
-         if (temp != (int)temp)
-            temp = (int)(temp - 1);
-      }
+      temp = (2 - (d[0] + d[1])) >> 2;
 
-      *r++ = x[0] - (int)(temp);
+      *r++ = x[0] - temp;
       x+=2;
       d++;
    }
@@ -141,17 +126,9 @@ void inversef97M(int *x, int N)
 
    for (n = half + 3; n--;)
    {
-      double rounding = (-1.0/4 * (d[-1] + d[-2]) + 0.5);
+      int rounding = (2 - (d[-1] + d[-2])) >> 2;
 
-      if (rounding > 0)
-         rounding = (int)rounding;
-      else
-      {
-         if (rounding != (int)rounding)
-            rounding = (int)(rounding - 1);
-      }
-
-      *x_0++ = r[-1] + (int) rounding;
+      *x_0++ = r[-1] + rounding;
       d++;
       r++;
    }
@@ -162,18 +139,9 @@ void inversef97M(int *x, int N)
 
    for (n = half; n--;)
    {
-      double rounding;
+      int rounding = (9 * (x_0[1] + x_0[2]) - (x_0[0] + x_0[3]) + 8) >> 4;
 
-      rounding = (-1.0/16 * (x_0[0] + x_0[3]) + 9.0/16 * (x_0[1] + x_0[2]) + 0.5);
-      if (rounding > 0)
-         rounding = (int)rounding;
-      else
-      {
-         if (rounding != (int)rounding)
-            rounding = (int)(rounding - 1);
-      }
-
-      *x_1++ = d[0] + (int) rounding;
+      *x_1++ = d[0] + rounding;
 
       x_0++;
       d++;

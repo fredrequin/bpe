@@ -368,49 +368,49 @@ void ACGaggleDecoding(StructCodingPara *PtrCoding,
 
 void DPCM_ACDeMapper(BitPlaneBits *BlockCodingInfo, int size, short N)
 {
-   short * diff_AC;
-   short theta = 0;
-   int i;
-   int X_Min = 0;
-   int X_Max = ((1 << N) - 1) ;
+    int16_t *diff_AC;
+    int16_t  theta = 0;
+    int i;
+    int X_Min = 0;
+    int X_Max = ((1 << N) - 1);
 
-   diff_AC = (short *)calloc(size,sizeof(short));
+    diff_AC = (int16_t *)calloc(size, sizeof(int16_t));
 
-   BlockCodingInfo[0].BitMaxAC = (uint8_t)BlockCodingInfo[0].MappedAC;
+    BlockCodingInfo[0].BitMaxAC = (uint8_t)BlockCodingInfo[0].MappedAC;
 
-   for (i = 1; i < size; i++)
-   {
-      theta = min(BlockCodingInfo[i-1].BitMaxAC  - X_Min, X_Max - BlockCodingInfo[i-1].BitMaxAC );
-      if((float)BlockCodingInfo[i].MappedAC / 2 == BlockCodingInfo[i].MappedAC / 2)
-      {
-         diff_AC[i] = (short)(BlockCodingInfo[i].MappedAC / 2);
-         if(diff_AC[i] >= 0 && diff_AC[i] <= theta)
-         {
-            BlockCodingInfo[i].BitMaxAC = diff_AC[i] + BlockCodingInfo[i - 1].BitMaxAC;
-            continue;
-         }
-      }
-      else
-      {
-         diff_AC[i] = - (short)((BlockCodingInfo[i].MappedAC + 1) / 2) ;
-         if(diff_AC[i] <= 0 && diff_AC[i] >= -theta)
-         {
-            BlockCodingInfo[i].BitMaxAC = diff_AC[i] + BlockCodingInfo[i - 1].BitMaxAC;
-            continue;
-         }
-      }
-      diff_AC[i] = (short)(BlockCodingInfo[i].MappedAC  - theta);
+    for (i = 1; i < size; i++)
+    {
+        theta = min(BlockCodingInfo[i-1].BitMaxAC  - X_Min, X_Max - BlockCodingInfo[i-1].BitMaxAC );
+        if (BlockCodingInfo[i].MappedAC & 1) /* odd value */
+        {
+            diff_AC[i] = - (int16_t)((BlockCodingInfo[i].MappedAC + 1) / 2) ;
+            if (diff_AC[i] <= 0 && diff_AC[i] >= -theta)
+            {
+                BlockCodingInfo[i].BitMaxAC = diff_AC[i] + BlockCodingInfo[i - 1].BitMaxAC;
+                continue;
+            }
+        }
+        else /* even value */
+        {
+            diff_AC[i] = (int16_t)(BlockCodingInfo[i].MappedAC / 2);
+            if (diff_AC[i] >= 0 && diff_AC[i] <= theta)
+            {
+                BlockCodingInfo[i].BitMaxAC = diff_AC[i] + BlockCodingInfo[i - 1].BitMaxAC;
+                continue;
+            }
+        }
+        diff_AC[i] = (int16_t)(BlockCodingInfo[i].MappedAC  - theta);
 
-      BlockCodingInfo[i].BitMaxAC = diff_AC[i] +  BlockCodingInfo[i - 1].BitMaxAC;
+        BlockCodingInfo[i].BitMaxAC = diff_AC[i] +  BlockCodingInfo[i - 1].BitMaxAC;
 
-      if(    BlockCodingInfo[i].BitMaxAC < X_Min ||  BlockCodingInfo[i].BitMaxAC > X_Max)
-      {
-         diff_AC[i] = -diff_AC[i];
-          BlockCodingInfo[i].BitMaxAC = diff_AC[i] +  BlockCodingInfo[i - 1].BitMaxAC;
-      }
-   }
-   free(diff_AC);
-   return;
+        if ((BlockCodingInfo[i].BitMaxAC < X_Min) || (BlockCodingInfo[i].BitMaxAC > X_Max))
+        {
+            diff_AC[i] = -diff_AC[i];
+            BlockCodingInfo[i].BitMaxAC = diff_AC[i] +  BlockCodingInfo[i - 1].BitMaxAC;
+        }
+    }
+    free(diff_AC);
+    return;
 }
 
 

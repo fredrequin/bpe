@@ -593,16 +593,19 @@ void DPCM_DCDeMapper(BitPlaneBits *BlockInfo,
       theta = min(BlockInfo[i-1].ShiftedDC - X_Min, X_Max - BlockInfo[i-1].ShiftedDC);
 
       /* --- Begin bug fix (Kiely) --- */
-      if (BlockInfo[i].MappedDC > 2*theta) {
+      if (BlockInfo[i].MappedDC > 2*theta)
+      {
          if ((long int)BlockInfo[i - 1].ShiftedDC < 0)
             diff_DC[i] = BlockInfo[i].MappedDC - theta;
          else
             diff_DC[i] = theta - BlockInfo[i].MappedDC;
-      } else {
-         if ((float)BlockInfo[i].MappedDC / 2 == BlockInfo[i].MappedDC / 2)
-            diff_DC[i] = BlockInfo[i].MappedDC / 2;
-         else
+      }
+      else
+      {
+         if (BlockInfo[i].MappedDC & 1) /* odd value */
             diff_DC[i] = -(long)(BlockInfo[i].MappedDC + 1) / 2 ;
+         else /* even value */
+            diff_DC[i] = BlockInfo[i].MappedDC / 2;
       }
       BlockInfo[i].ShiftedDC = diff_DC[i] + BlockInfo[i - 1].ShiftedDC;
       /* --- End bug fix (Kiely) --- */
