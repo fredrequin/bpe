@@ -297,7 +297,7 @@ int main(int argc, char **argv)
         }
         else
         {
-            PtrCoding->PtrHeader->Header.Part2.SegByteLimit_27Bits = BYTE_SEGMENT_SIZE - 1;
+            PtrCoding->PtrHeader->Header.Part2.SegByteLimit_27Bits = BYTE_SEGMENT_MAX;
         }
 
       // DebugInfo( "\tBegin to encode...\n");

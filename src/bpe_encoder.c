@@ -442,9 +442,9 @@ void EncoderEngine(StructCodingPara * PtrCoding)
             if (PtrCoding->BitsPerPixel != 0)
             {
                int32_t limit = PtrCoding->PtrHeader->Header.Part3.S_20Bits * PtrCoding->BitsPerPixel / 8;
-               if (limit >= BYTE_SEGMENT_SIZE)
+               if (limit > BYTE_SEGMENT_MAX)
                {
-                  PtrCoding->PtrHeader->Header.Part2.SegByteLimit_27Bits = BYTE_SEGMENT_SIZE - 1;
+                  PtrCoding->PtrHeader->Header.Part2.SegByteLimit_27Bits = BYTE_SEGMENT_MAX;
                }
                else
                {
@@ -453,7 +453,7 @@ void EncoderEngine(StructCodingPara * PtrCoding)
             }
             else
             {
-               PtrCoding->PtrHeader->Header.Part2.SegByteLimit_27Bits = BYTE_SEGMENT_SIZE - 1;
+               PtrCoding->PtrHeader->Header.Part2.SegByteLimit_27Bits = BYTE_SEGMENT_MAX;
             }
       }
 

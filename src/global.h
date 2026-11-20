@@ -97,7 +97,7 @@ typedef unsigned char BOOL;
 #define BLOCK_SEGMENT_SIZE      (1 << 20)
 #define BLOCK_SEGMENT_MASK      (BLOCK_SEGMENT_SIZE - 1)
 #define BYTE_SEGMENT_SIZE       (1 << 27)
-#define BYTE_SEGMENT_MASK       (BYTE_SEGMENT_SIZE - 1)
+#define BYTE_SEGMENT_MAX        (BYTE_SEGMENT_SIZE - 8)
 
 //////////////////////////////////////////////////////////////////////////////
 
