@@ -166,106 +166,83 @@ Return values:
 }
 
 
-short ImageRead(StructCodingPara *StrPtr,
-            int **image)
+short ImageRead(StructCodingPara *StrPtr, int **image)
 {
-   uint32_t r = 0;
-   uint32_t i = 0;
-   FILE *infile = NULL;
-   uint8_t machineendianness;  // indicates endian-ness of the computer -- bug fix (Kiely)
-   unsigned long int bigendtest = 1;  //  bug fix (Kiely)
-
-   infile = fopen(StrPtr->InputFile,"rb");
-   if (infile == NULL)
-   {
-      DebugInfo("Error: Unable to read the image file!\n");
-      ErrorMsg(BPE_FILE_ERROR);
-   }
-
-   if (StrPtr->PtrHeader->Header.Part4.PixelBitDepth_4Bits <= 8
-      && StrPtr->PtrHeader->Header.Part4.PixelBitDepth_4Bits != 0)
-   {
-      if(StrPtr->PtrHeader->Header.Part4.SignedPixels == FALSE) // unsigned image
-      {
-         uint8_t *temp;
-         temp = (uint8_t *)calloc(sizeof(uint8_t), StrPtr->ImageWidth);
-         for(r = 0; r < StrPtr->ImageRows;  r++)
-         {
-            (void)fread(temp, StrPtr->ImageWidth, sizeof(char),infile);
-            for(i = 0; i < StrPtr->ImageWidth; i++)
-               image[r][i] = temp[i];
-         }
-         free(temp);
-      }
-      else
-      {
-         char *temp;
-         temp = (char *)calloc(sizeof(char), StrPtr->ImageWidth);
-         for(r = 0; r < StrPtr->ImageRows;  r++)
-         {
-            (void)fread(temp, StrPtr->ImageWidth, sizeof(char),infile);
-            for(i = 0; i < StrPtr->ImageWidth; i++)
-               image[r][i] = temp[i];
-         }
-         free(temp);
-      }
-   }
-   else if(StrPtr->PtrHeader->Header.Part4.PixelBitDepth_4Bits == 0 ||
-      StrPtr->PtrHeader->Header.Part4.PixelBitDepth_4Bits <= 15) // it is 16 bits
-   {
-      if(StrPtr->PtrHeader->Header.Part4.SignedPixels == FALSE) // unsigned image
-      {
-         uint16_t *temp_16;
-         temp_16 = (uint16_t *)calloc(sizeof(uint16_t), StrPtr->ImageWidth);
-         for(r=0; r<StrPtr->ImageRows; r++)
-         {
-            (void)fread(temp_16, StrPtr->ImageWidth, sizeof(short),infile);
-            for(i = 0; i <  StrPtr->ImageWidth; i++)
+    /* 1 to 8-bit pixels: 1 byte; 9 to 16-bit pixels: 2 bytes, order given by PixelByteOrder
+       (0: LSB first, 1: MSB first). Pixels are rebuilt byte by byte: no dependency on the
+       host endianness nor on the signedness of char. */
+    uint8_t  depth     = StrPtr->PtrHeader->Header.Part4.PixelBitDepth_4Bits;  /* 0: 16 bits */
+    BOOL     is_signed = StrPtr->PtrHeader->Header.Part4.SignedPixels;
+    uint32_t width     = StrPtr->ImageWidth;
+    size_t   nbytes;
+    int      sign, mask;
+    uint8_t *row;
+    uint32_t r, i, j;
+    FILE    *infile;
+    
+    if (depth > 0 && depth <= 8)
+    {
+        nbytes = sizeof(uint8_t);
+        sign   = 0x80;
+        mask   = 0x7F;
+    }
+    else
+    {
+        nbytes = sizeof(uint16_t);
+        sign   = 0x8000;
+        mask   = 0x7FFF;
+    }
+    
+    if ((infile = fopen(StrPtr->InputFile,"rb")) == NULL)
+    {
+        DebugInfo("Error: Unable to read the image file!\n");
+        ErrorMsg(BPE_FILE_ERROR);
+    }
+    if ((row = (uint8_t *)malloc(nbytes * width)) == NULL)
+    {
+        fclose(infile);
+        ErrorMsg(BPE_MEM_ERROR);
+    }
+    
+    for (r = 0; r < StrPtr->ImageRows; r++)
+    {
+        if (fread(row, nbytes, width, infile) != width)
+        {
+            DebugInfo("Error: image file too short!\n");
+            free(row);
+            fclose(infile);
+            ErrorMsg(BPE_FILE_ERROR);
+        }
+        
+        for (i = 0, j = 0; i < width; i++, j += nbytes)
+        {
+            uint32_t v;
+            
+            if (nbytes == sizeof(uint8_t)) // 8-bit data
             {
-               //image[r][i] = ((temp_16[i] & 0x00FF) << 8) + ((temp_16[i] & 0xFF00) >> 8);
-
-               image[r][i] = temp_16[i];
+                v = row[j];
             }
-         }
-         free(temp_16);
-      }
-      else
-      {
-         short *temp_16;
-         temp_16 = (short *)calloc(sizeof(short), StrPtr->ImageWidth);
-         for(r=0; r<StrPtr->ImageRows; r++)
-         {
-            (void)fread(temp_16, StrPtr->ImageWidth, sizeof(short),infile);
-            for(i = 0; i <  StrPtr->ImageWidth; i++)
-               image[r][i] = temp_16[i];
-         }
-         free(temp_16);
-      }
-
-
-      /* --- Begin bug fix (Kiely) --- */
-      // machineendianness will be 1 if computer is big-endian, or 0 if little-endian
-      machineendianness = (((char *)&bigendtest)[0]==0);
-
-      // swap pixel byte order if computer and image endianness do not match
-      if ( StrPtr->PixelByteOrder != machineendianness)
-      {
-         const unsigned short MSBmask=0xFF00;
-
-         for(r = 0; r <  StrPtr->ImageRows; r++)
-         {
-            for (i = 0; i <  StrPtr->ImageWidth; i ++)
-               image[r][i] = (image[r][i]>>8) + ((image[r][i]<<8) & MSBmask) ;
-         }
-      }
-      /* --- End bug fix (Kiely) --- */
-
-   }
-   else
-      ErrorMsg(BPE_FILE_ERROR);
-
-   fclose(infile);
-   return BPE_OK;
+            else // 16-bit data
+            {
+                v = (StrPtr->PixelByteOrder)
+                  ? ((uint32_t)row[j] << 8) | row[j + 1]
+                  : ((uint32_t)row[j + 1] << 8) | row[j];
+            }
+            
+            if (is_signed)   /* sign extension from the MSB of the container */
+            {
+                image[r][i] = (mask & v) - (sign & v);
+            }
+            else
+            {
+                image[r][i] = (int)v;
+            }
+        }
+    }
+    
+    free(row);
+    fclose(infile);
+    return BPE_OK;
 }
 
 
