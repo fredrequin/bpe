@@ -19,84 +19,79 @@ Nov. 3, 2006
 
 void OutputCodeWord(StructCodingPara * Ptr)
 {
-   Ptr->Bits->CodeWordAlighmentBits ++;
-   Ptr->Bits->SegBitCounter++;
-   Ptr->Bits->TotalBitCounter ++;
-
-   if (Ptr->Bits->CodeWordAlighmentBits == Ptr->Bits->CodeWord_Length)
-   {
-      /* MSB first, not machine dependant */
-      uint32_t n;
-
-      for (n = Ptr->Bits->CodeWord_Length; n > 0; n -= 8)
-      {
-         putc((uint8_t)(Ptr->Bits->ByteBuffer_4Bytes >> (n - 8)), Ptr->Bits->F_Bits);
-      }
-      Ptr->Bits->CodeWordAlighmentBits = 0;
-   }
+    Ptr->Bits->CodeWordAlighmentBits++;
+    Ptr->Bits->SegBitCounter++;
+    Ptr->Bits->TotalBitCounter++;
+    
+    if (Ptr->Bits->CodeWordAlighmentBits == Ptr->Bits->CodeWord_Length)
+    {
+        /* MSB first, not machine dependant */
+        uint32_t n;
+    
+        for (n = Ptr->Bits->CodeWord_Length; n > 0; n -= 8)
+        {
+            putc((uint8_t)(Ptr->Bits->ByteBuffer_4Bytes >> (n - 8)), Ptr->Bits->F_Bits);
+        }
+        Ptr->Bits->CodeWordAlighmentBits = 0;
+    }
 }
 
 
 
-void BitsOutput(StructCodingPara *Ptr,
-            uint32_t bit,
-            int length)
+void BitsOutput(StructCodingPara *Ptr, uint32_t bit, int length)
 {
-   short i;
-//   short CodeWord_Length;
-   uint8_t temp_bits;
-   if(length == 0)
-      return;
-   if(Ptr->SegmentFull == TRUE)
-      return;
+    uint32_t bit_mask;
 
-   // determine if there is limitation on the total number of bytes output in this segment.
-   // first check if Part 2 of the header is available.
+    if (length == 0) return;
+    if (Ptr->SegmentFull == TRUE) return;
+    
+    // determine if there is limitation on the total number of bytes output in this segment.
+    // first check if Part 2 of the header is available.
+    
+    if (Ptr->PtrHeader->Header.Part2.SegByteLimit_27Bits != 0)
+    {
+        // means that there might be a limitation on the total number of bits.
+        if ((Ptr->Bits->SegBitCounter + length) >= (Ptr->PtrHeader->Header.Part2.SegByteLimit_27Bits * 8))
+        {
+            int bits_left;
 
-   if((Ptr->PtrHeader->Header.Part2.SegByteLimit_27Bits != 0))
-   {
-      // means that there might be a limitation on the total number of bits.
-      if(Ptr->Bits->SegBitCounter + (uint32_t)length  >=    Ptr->PtrHeader->Header.Part2.SegByteLimit_27Bits * 8)
-      {
-         short RemainderBits = 0;
-         Ptr->SegmentFull = TRUE;
-         RemainderBits = (short)(Ptr->PtrHeader->Header.Part2.SegByteLimit_27Bits * 8 -
-            Ptr->Bits->SegBitCounter);
+            Ptr->SegmentFull = TRUE;
+            bits_left = (int)(Ptr->PtrHeader->Header.Part2.SegByteLimit_27Bits * 8 - Ptr->Bits->SegBitCounter);
+            bit_mask  = (uint32_t)1 << (length - 1);
+    
+            while (bits_left > 0)
+            {
+                Ptr->Bits->ByteBuffer_4Bytes <<= 1;
+                if (bit & bit_mask) Ptr->Bits->ByteBuffer_4Bytes++;
+                OutputCodeWord(Ptr);
+                bit_mask >>= 1;
+                bits_left--;
+            }
+    
+            return;
+        }
+    }
 
-         for (i = RemainderBits - 1; i >= 0; i --)
-         {
-            temp_bits = (uint8_t) (0x01 & (bit >> (length - 1)));
-            length--;
-//            Ptr->Bits->SegBitCounter++;
-//            Ptr->Bits->TotalBitCounter ++;
-            Ptr->Bits->ByteBuffer_4Bytes <<= 1;
-            Ptr->Bits->ByteBuffer_4Bytes += temp_bits;
-            OutputCodeWord(Ptr);
-         }
+    // Determine the Codeword length by the header part 4.
+    // When length > 32 : bits #32-63 are all zeros ???
+    while (length > 32)
+    {
+        Ptr->Bits->ByteBuffer_4Bytes <<= 1;
+        OutputCodeWord(Ptr);
+        length--;
+    }
 
-         return;
-      }
-   }
+    bit_mask = (uint32_t)1 << (length - 1);
+    while (length > 0)
+    {
+        Ptr->Bits->ByteBuffer_4Bytes <<= 1;
+        if (bit & bit_mask) Ptr->Bits->ByteBuffer_4Bytes++;
+        OutputCodeWord(Ptr);
+        bit_mask >>= 1;
+        length--;
+    }
 
-// determine the Codeword length by the header part 4.
-   if (length > 32)
-   {
-      int tt = length - 32;
-
-      Ptr->Bits->ByteBuffer_4Bytes <<= tt;
-      OutputCodeWord(Ptr);
-      length = 32;
-   }
-
-   for (i = length - 1; i >= 0; i --)
-   {
-      temp_bits = (uint8_t) (0x01 & (bit >> i));
-      Ptr->Bits->ByteBuffer_4Bytes <<= 1;
-      Ptr->Bits->ByteBuffer_4Bytes += temp_bits;
-      OutputCodeWord(Ptr);
-   }
-
-   return;
+    return;
 }
 
 
