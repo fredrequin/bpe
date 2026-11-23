@@ -19,173 +19,208 @@ Nov. 3, 2006
 #include <stdio.h>
 #include "global.h"
 
-
-void RiceCoding(short InputVal,
-              short BitLength,
-              uint8_t *Option,
-              StructCodingPara *PtrCoding )
+typedef struct
 {
-   switch(BitLength)
-   {
-   case 0:    // no need to process
-      return;
-   case 1:
-      BitsOutput(PtrCoding, InputVal, 1);
-      break;
-   case 2:
-      //ouput FS code.
-      if (Option[0] == 1)
-         BitsOutput(PtrCoding, InputVal, 2);
+    uint32_t val;
+    int      len;
+} t_code_tab;
 
-      else if (Option[0] == 0) // nk = 0
-      {
-         if (InputVal <= 2)
-         {
-            BitsOutput(PtrCoding, 0, InputVal);
-            BitsOutput(PtrCoding, 1, 1);
-         }
-         else
-            BitsOutput(PtrCoding, 0, 3);
-      }
-      else
-         ErrorMsg(BPE_RICE_CODING_ERROR);
-      break;
-   case 3:
-      if (Option[1] == 0) // nk =0, no split.
-      {
-         if (InputVal <= 2)
-         {
-            BitsOutput(PtrCoding, 0, InputVal);
-            BitsOutput(PtrCoding, 1, 1);
-         }
-         else if (InputVal <= 5)
-         {
-            BitsOutput(PtrCoding, 0, 3);
-            BitsOutput(PtrCoding, InputVal - 3, 2);
-         }
-         else if (InputVal <= 7)
-         {
-            BitsOutput(PtrCoding, 0, 3);
-            BitsOutput(PtrCoding, InputVal, 3);
-         }
-         else
-            ErrorMsg(BPE_RICE_CODING_ERROR);
-      }
-      else if (Option[1] == 1) // nk =1
-      {
-         if (InputVal <= 1)
-         {
-            BitsOutput(PtrCoding, InputVal + 2, 2);
-         }
-         else if (InputVal <= 3)
-         {
-            BitsOutput(PtrCoding, InputVal, 3);
-         }
-         else if (InputVal <= 7)
-         {
-            BitsOutput(PtrCoding, 0, 2);
-            if (InputVal == 4)
-               BitsOutput(PtrCoding, 2, 2);
+static const t_code_tab c_code_tab_2b[2][4] =
+{
+    {
+        { 0, 2 }, // 00 : 0
+        { 1, 2 }, // 01 : 1
+        { 2, 2 }, // 10 : 2
+        { 3, 2 }  // 11 : 3
+    },
+    {
+        { 1, 1 }, // 1 : 0
+        { 1, 2 }, // 01 : 1
+        { 1, 3 }, // 001 : 2
+        { 0, 3 }  // 000 : 3
+    }
+};
+
+static const t_code_tab c_code_tab_3b[2][8] =
+{
+    {
+        { 1, 1 }, // 1 : 0
+        { 1, 2 }, // 01 : 1
+        { 1, 3 }, // 001 : 2
+        { 0, 5 }, // 00000 : 3
+        { 1, 5 }, // 00001 : 4
+        { 2, 5 }, // 00010 : 5
+        { 6, 6 }, // 000110 : 6
+        { 7, 6 }  // 000111 : 7
+    },
+    {
+        { 2, 2 }, // 10 : 0
+        { 3, 2 }, // 11 : 1
+        { 2, 3 }, // 010 : 2
+        { 3, 3 }, // 011 : 3
+        { 2, 4 }, // 0010 : 4
+        { 3, 4 }, // 0011 : 5
+        { 0, 4 }, // 0000 : 6
+        { 1, 4 }  // 0001 : 7
+    }
+};
+
+static const t_code_tab c_code_tab_4b[4][16] =
+{
+    {
+        {  1, 1 }, // 1 : 0
+        {  1, 2 }, // 01 : 1
+        {  1, 3 }, // 001 : 2
+        {  1, 4 }, // 0001 : 3
+        {  0, 7 }, // 0000000 : 4
+        {  1, 7 }, // 0000001 : 5
+        {  2, 7 }, // 0000010 : 6
+        {  3, 7 }, // 0000011 : 7
+        {  8, 8 }, // 00001000 : 8
+        {  9, 8 }, // 00001001 : 9
+        { 10, 8 }, // 00001010 : 10
+        { 11, 8 }, // 00001011 : 11
+        { 12, 8 }, // 00001100 : 12
+        { 13, 8 }, // 00001101 : 13
+        { 14, 8 }, // 00001110 : 14
+        { 15, 8 }  // 00001111 : 15
+    },
+    {
+        {  2, 2 }, // 10 : 0
+        {  3, 2 }, // 11 : 1
+        {  2, 3 }, // 010 : 2
+        {  3, 3 }, // 011 : 3
+        {  2, 4 }, // 0010 : 4
+        {  3, 4 }, // 0011 : 5
+        {  0, 6 }, // 000000 : 6
+        {  1, 6 }, // 000001 : 7
+        {  2, 6 }, // 000010 : 8
+        {  3, 6 }, // 000011 : 9
+        {  4, 6 }, // 000100 : 10
+        {  5, 6 }, // 000101 : 11
+        { 12, 7 }, // 0001100 : 12
+        { 13, 7 }, // 0001101 : 13
+        { 14, 7 }, // 0001110 : 14
+        { 15, 7 }  // 0001111 : 15
+    },
+    {
+        {  4, 3 }, // 100 : 0
+        {  5, 3 }, // 101 : 1
+        {  6, 3 }, // 110 : 2
+        {  7, 3 }, // 111 : 3
+        {  4, 4 }, // 0100 : 4
+        {  5, 4 }, // 0101 : 5
+        {  6, 4 }, // 0110 : 6
+        {  7, 4 }, // 0111 : 7
+        {  4, 5 }, // 00100 : 8
+        {  5, 5 }, // 00101 : 9
+        {  6, 5 }, // 00110 : 10
+        {  7, 5 }, // 00111 : 11
+        {  0, 5 }, // 00000 : 12
+        {  1, 5 }, // 00001 : 13
+        {  2, 5 }, // 00010 : 14
+        {  3, 5 }  // 00011 : 15
+    },
+    {
+        {  0, 4 }, // 0000 : 0
+        {  1, 4 }, // 0001 : 1
+        {  2, 4 }, // 0010 : 2
+        {  3, 4 }, // 0011 : 3
+        {  4, 4 }, // 0100 : 4
+        {  5, 4 }, // 0101 : 5
+        {  6, 4 }, // 0110 : 6
+        {  7, 4 }, // 0111 : 7
+        {  8, 4 }, // 1000 : 8
+        {  9, 4 }, // 1001 : 9
+        { 10, 4 }, // 1010 : 10
+        { 11, 4 }, // 1011 : 11
+        { 12, 4 }, // 1100 : 12
+        { 13, 4 }, // 1101 : 13
+        { 14, 4 }, // 1110 : 14
+        { 15, 4 }  // 1111 : 15
+    }
+};
+
+void RiceCoding(uint8_t InputVal, uint8_t BitLength, uint8_t *Option, StructCodingPara *PtrCoding)
+{
+    const t_code_tab *p;
+    
+    switch(BitLength)
+    {
+        case 0:
+        {
+            return; // no need to process
+        }
+
+        case 1:
+        {
+            // 0 : 0
+            // 1 : 1
+
+            BitsOutput(PtrCoding, InputVal, 1);
+            break;
+        }
+
+        case 2:
+        {
+            if ((Option[0] <= 1) && (InputVal <= 3))
+            {
+                p = &c_code_tab_2b[Option[0]][InputVal];
+                BitsOutput(PtrCoding, p->val, p->len);
+            }
             else
-               if (InputVal == 5)
-                  BitsOutput(PtrCoding, 3, 2);
-               else
-                  if (InputVal == 6)
-                     BitsOutput(PtrCoding, 0, 2);
-                  else
-                     if (InputVal == 7)
-                        BitsOutput(PtrCoding, 1, 2);
-         }
-         else
-            ErrorMsg(BPE_RICE_CODING_ERROR);
-      }
-      else if (Option[1] == 3) // uncoded .
-      {
-         BitsOutput(PtrCoding, InputVal, 3);
-      }
-      break;
-   case 4: //4-bit
-      if (Option[2] == 0) // no split.
-      {
-         if (InputVal <= 3)
-         {
-            BitsOutput(PtrCoding, 0, InputVal);
-            BitsOutput(PtrCoding, 1, 1);
-         }
-         else if (InputVal <= 7)
-         {
-            BitsOutput(PtrCoding, 0, 5);
-            BitsOutput(PtrCoding, InputVal - 4, 2);
-         }
-         else if (InputVal <= 15)
-         {
-            BitsOutput(PtrCoding, 0, 4);
-            BitsOutput(PtrCoding, InputVal, 4);
-         }
-         else
-            ErrorMsg(BPE_RICE_CODING_ERROR);
-      }
-      else if (Option[2] == 1) // split only one bit.
-      {
-         if (InputVal <= 1)
-         {
-            BitsOutput(PtrCoding, InputVal + 2, 2);
-         }
-         else if (InputVal <= 3)
-         {
-            BitsOutput(PtrCoding, InputVal, 3);
-         }
-         else if (InputVal <= 5)
-         {
-            BitsOutput(PtrCoding, 0, 2);
-            BitsOutput(PtrCoding, InputVal - 2, 2);
-         }
-         else if (InputVal <= 11)
-         {
-            BitsOutput(PtrCoding, 0, 3);
-            BitsOutput(PtrCoding, InputVal - 6, 3);
-         }
-         else if (InputVal <= 15)
-         {
-            BitsOutput(PtrCoding, 0, 3);
-            BitsOutput(PtrCoding, InputVal, 4);
-         }
-         else
-            ErrorMsg(BPE_RICE_CODING_ERROR);
-      }
-      else if (Option[2] == 2) // split two bits.
-      {
-         if (InputVal <= 3)
-         {
-            BitsOutput(PtrCoding, InputVal + 4, 3);
-         }
-         else if (InputVal <= 7)
-         {
-            BitsOutput(PtrCoding, InputVal, 4);
-         }
-         else if (InputVal <= 11)
-         {
-            BitsOutput(PtrCoding, 0, 2);
-            BitsOutput(PtrCoding, InputVal - 4, 3);
-         }
-         else if (InputVal <= 15)
-         {
-            BitsOutput(PtrCoding, InputVal - 12, 5);
-         }
-         else
-            ErrorMsg(BPE_RICE_CODING_ERROR);
-      }
+            {
+                ErrorMsg(BPE_RICE_CODING_ERROR);
+            }
+            break;
+        }
 
-      else if (Option[2] == 3) // uncoded
-      {
-         BitsOutput(PtrCoding, InputVal, 4);
-      }
-      else
-         ErrorMsg(BPE_RICE_CODING_ERROR);//"Invalid split option!\n");
-      break;
-   default:
-      ErrorMsg(BPE_RICE_CODING_ERROR);//"Invalid bit length!\n");
-   }
+        case 3:
+        {
+            if ((Option[1] <= 1) && (InputVal <= 7))
+            {
+                p = &c_code_tab_3b[Option[1]][InputVal];
+                BitsOutput(PtrCoding, p->val, p->len);
+            }
+            else if (Option[1] == 3) // Uncoded
+            {
+                // 000 : 0
+                // 001 : 1
+                // 010 : 2
+                // 011 : 3
+                // 100 : 4
+                // 101 : 5
+                // 110 : 6
+                // 111 : 7
+
+                BitsOutput(PtrCoding, InputVal, 3);
+            }
+            else
+            {
+                ErrorMsg(BPE_RICE_CODING_ERROR);
+            }
+            break;
+        }
+
+        case 4:
+        {
+            if ((Option[2] <= 3) && (InputVal <= 15))
+            {
+                p = &c_code_tab_4b[Option[2]][InputVal];
+                BitsOutput(PtrCoding, p->val, p->len);
+            }
+            else
+            {
+                ErrorMsg(BPE_RICE_CODING_ERROR);
+            }
+            break;
+        }
+
+        default:
+        {
+            ErrorMsg(BPE_RICE_CODING_ERROR);
+        }
+    }
 }
 
 
@@ -398,7 +433,7 @@ void RiceDecoding(uint32_t *decoded, short BitLength, uint8_t *splitOption, Stru
                         else
                         {
                             BitsRead(Ptr, &WordReadin, 1);
-                            *decoded = (WordReadin) ? 7 : 6;
+                            *decoded = WordReadin + 6;
                         }
             
                     }
@@ -533,16 +568,16 @@ void RiceDecoding(uint32_t *decoded, short BitLength, uint8_t *splitOption, Stru
                     // 011 : 3
                     // 0010 : 4
                     // 0011 : 5
+                    // 000000 : 6
+                    // 000001 : 7
+                    // 000010 : 8
+                    // 000011 : 9
                     // 000100 : 10
                     // 000101 : 11
                     // 0001100 : 12
                     // 0001101 : 13
                     // 0001110 : 14
                     // 0001111 : 15
-                    // 000000 : 6
-                    // 000001 : 7
-                    // 000010 : 8
-                    // 000011 : 9
 
                     BitsRead(Ptr, &WordReadin, 2);
                     if (Ptr->RateReached == TRUE)

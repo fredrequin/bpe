@@ -113,11 +113,11 @@ typedef struct BITSTREAM
 
 typedef struct SYMBOLDETAILS
 {
-   uint8_t sym_val : 4;
-   uint8_t sym_len : 4;
-   uint8_t sym_mapped_pattern : 4;
-   uint8_t sign : 4;
-   uint8_t type : 3;
+   uint8_t sym_val;
+   uint8_t sym_len;
+   uint8_t sym_mapped_pattern;
+   uint8_t sign;
+   uint8_t type;
 }StrSymbolDetails;
 
 typedef struct TYPEC

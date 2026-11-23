@@ -19,10 +19,7 @@ Nov. 3, 2006
 #include <stdlib.h>
 #include <stdio.h>
 
-extern void RiceCoding(short InputVal,
-              short BitLength,
-              uint8_t *Option,
-              StructCodingPara *PtrCoding );
+extern void RiceCoding(uint8_t InputVal, uint8_t BitLength, uint8_t *Option, StructCodingPara *PtrCoding);
 
 extern void BitPlaneSymbolReset(StrSymbolDetails *SymbolStr);
 
