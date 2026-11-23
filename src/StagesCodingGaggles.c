@@ -24,195 +24,202 @@ extern void RiceCoding(uint8_t InputVal, uint8_t BitLength, uint8_t *Option, Str
 extern void BitPlaneSymbolReset(StrSymbolDetails *SymbolStr);
 
 void StagesEnCodingGaggles1(StructCodingPara *PtrCoding,
-                         BitPlaneBits *BlockInfo,
-                         int BlocksInGaggles,
-                         uint8_t Option[],
-                         BOOL FlagCodeOptionOutput[]  )
+                            BitPlaneBits *BlockInfo,
+                            int BlocksInGaggles,
+                            uint8_t Option[],
+                            BOOL FlagCodeOptionOutput[])
 {
-   int SymbolIndex;
-   int BlockSeq;
-   short i;
-   short counter= 0;
+    int bi; // Block index
+    int si; // Symbol index
+    
+    // nkeffix : Implement StageStop in 122x0b1c3 section 4.2.3.1 Table 4-5
+    if (PtrCoding->PtrHeader->Header.Part2.StageStop_2Bits == 0 &&
+        (PtrCoding->PtrHeader->Header.Part2.BitPlaneStop_5Bits == PtrCoding->BitPlane - 1 ||
+            PtrCoding->altStageStop))
+        return;
 
-   // nkeffix : Implement StageStop in 122x0b1c3 section 4.2.3.1 Table 4-5
-   if (PtrCoding->PtrHeader->Header.Part2.StageStop_2Bits == 0 &&
-      (PtrCoding->PtrHeader->Header.Part2.BitPlaneStop_5Bits == PtrCoding->BitPlane - 1 ||
-         PtrCoding->altStageStop))
-      return;
-   for (BlockSeq = 0; BlockSeq <BlocksInGaggles; BlockSeq++)
-   {
-      if (BlockInfo[BlockSeq].BitMaxAC < PtrCoding->BitPlane)
-         continue;
+    for (bi = 0; bi < BlocksInGaggles; bi++)
+    {
+        if (BlockInfo[bi].BitMaxAC < PtrCoding->BitPlane) continue;
+    
+        for (si = 0; si < MAX_SYMBOLS_IN_BLOCK; si++)
+        {
+            StrSymbolDetails *sym = &BlockInfo[bi].SymbolsBlock[si];
 
-      for(SymbolIndex = 0; SymbolIndex < MAX_SYMBOLS_IN_BLOCK; SymbolIndex ++)
-      {
-         if(BlockInfo[BlockSeq].SymbolsBlock[SymbolIndex].type == ENUM_TYPE_P)
-         {
-            switch(BlockInfo[BlockSeq].SymbolsBlock[SymbolIndex].sym_len)
+            if (sym->type == ENUM_TYPE_P)
             {
-            case 1:
-            case 2:
-            case 3:
-               if (BlockInfo[BlockSeq].SymbolsBlock[SymbolIndex].sym_len > 1)
-                  if(FlagCodeOptionOutput[BlockInfo[BlockSeq].SymbolsBlock[SymbolIndex].sym_len - 2]   == FALSE)
-                  {
-                     FlagCodeOptionOutput[BlockInfo[BlockSeq].SymbolsBlock[SymbolIndex].sym_len - 2] = TRUE;
-
-                     if(BlockInfo[BlockSeq].SymbolsBlock[SymbolIndex].sym_len == 2)
-                        BitsOutput(PtrCoding, Option[0], 1);
-                     else if(BlockInfo[BlockSeq].SymbolsBlock[SymbolIndex].sym_len == 3)
-                        BitsOutput(PtrCoding, Option[1], 2);
-                     else if(BlockInfo[BlockSeq].SymbolsBlock[SymbolIndex].sym_len == 4)
-                        BitsOutput(PtrCoding, Option[2], 2);
-                     else
-                        ErrorMsg(BPE_STAGE_CODING_ERROR);
-                  }
-
-                  RiceCoding(BlockInfo[BlockSeq].SymbolsBlock[SymbolIndex].sym_mapped_pattern,
-                     BlockInfo[BlockSeq].SymbolsBlock[SymbolIndex].sym_len, Option,
-                     PtrCoding);
-
-                  counter = 0;
-
-                  for(i = 0; i < BlockInfo[BlockSeq].SymbolsBlock[SymbolIndex].sym_len; i++)
-                  {
-                     if ((BlockInfo[BlockSeq].SymbolsBlock[SymbolIndex].sym_val & (1 << i)) >0)
-                        counter ++;
-                  }
-                  BitsOutput(PtrCoding, BlockInfo[BlockSeq].SymbolsBlock[SymbolIndex].sign, counter);
-                  BitPlaneSymbolReset(&(BlockInfo[BlockSeq].SymbolsBlock[SymbolIndex])) ;
-                  //reset the entry to zero.
-                  break;
-            default: ErrorMsg(BPE_STAGE_CODING_ERROR);//"invalid length");
+                switch (sym->sym_len)
+                {
+                    case 1:
+                    case 2:
+                    case 3:
+                    {
+                        int i;
+                        int counter = 0;
+                        
+                        if (sym->sym_len >= 2)
+                        {
+                            if (FlagCodeOptionOutput[sym->sym_len - 2] == FALSE)
+                            {
+                                FlagCodeOptionOutput[sym->sym_len - 2] = TRUE;
+            
+                                switch (sym->sym_len)
+                                {
+                                    case 2:  BitsOutput(PtrCoding, Option[0], 1); break;
+                                    case 3:  BitsOutput(PtrCoding, Option[1], 2); break;
+                                    case 4:  BitsOutput(PtrCoding, Option[2], 2); break;
+                                    default: ErrorMsg(BPE_STAGE_CODING_ERROR);
+                                }
+                            }
+                        }
+            
+                        RiceCoding(sym->sym_mapped_pattern, sym->sym_len, Option, PtrCoding);
+        
+                        for (i = 0; i < sym->sym_len; i++)
+                        {
+                            if (sym->sym_val & (1 << i)) counter++;
+                        }
+                        BitsOutput(PtrCoding, sym->sign, counter);
+                        BitPlaneSymbolReset(sym);
+                        break;
+                    }
+                    default:
+                    {
+                        ErrorMsg(BPE_STAGE_CODING_ERROR); // Invalid length
+                    }
+                }
             }
-         }
-      }
-   }
-   // nkeffix : removed redundant check
-   //if((PtrCoding->PtrHeader->Header.Part1.Part2Flag == TRUE)
-   //   &&(PtrCoding->PtrHeader->Header.Part2.StageStop_2Bits == 00))
-   //   return;
+        }
+    }
+    // nkeffix : removed redundant check
+    //if((PtrCoding->PtrHeader->Header.Part1.Part2Flag == TRUE)
+    //   &&(PtrCoding->PtrHeader->Header.Part2.StageStop_2Bits == 00))
+    //   return;
 }
    // begin the encoding of TranB+TranD+TypeCi
 
 void StagesEnCodingGaggles2(StructCodingPara *PtrCoding,
-                         BitPlaneBits *BlockInfo,
-                         int BlocksInGaggles,
-                         uint8_t Option[],
-                         BOOL FlagCodeOptionOutput[])
+                            BitPlaneBits *BlockInfo,
+                            int BlocksInGaggles,
+                            uint8_t Option[],
+                            BOOL FlagCodeOptionOutput[])
 {
-   int SymbolIndex;
-   int BlockSeq;
-   short i;
-   short counter= 0;
-
-   // nkeffix : Implement StageStop in 122x0b1c3 section 4.2.3.1 Table 4-5
-   if (PtrCoding->PtrHeader->Header.Part2.StageStop_2Bits < 1 &&
-      (PtrCoding->PtrHeader->Header.Part2.BitPlaneStop_5Bits == PtrCoding->BitPlane - 1 ||
-       PtrCoding->altStageStop))
-      return;
-
-   for (BlockSeq = 0; BlockSeq < BlocksInGaggles; BlockSeq++)
-   {
-      if (BlockInfo[BlockSeq].BitMaxAC < PtrCoding->BitPlane)
-         continue;
-
-      for(SymbolIndex = 0; SymbolIndex < MAX_SYMBOLS_IN_BLOCK; SymbolIndex ++)
-      {
-         switch(BlockInfo[BlockSeq].SymbolsBlock[SymbolIndex].type)
-         {
-         case ENUM_TRAN_B:
-         case ENUM_TRAN_D:
-         case ENUM_TYPE_CI:
-            if(BlockInfo[BlockSeq].SymbolsBlock[SymbolIndex].sym_len > 1)
-               if(FlagCodeOptionOutput[BlockInfo[BlockSeq].SymbolsBlock[SymbolIndex].sym_len - 2] == FALSE)
-               {
-                  FlagCodeOptionOutput[BlockInfo[BlockSeq].SymbolsBlock[SymbolIndex].sym_len - 2] = TRUE;
-                  if(BlockInfo[BlockSeq].SymbolsBlock[SymbolIndex].sym_len == 2)
-                     BitsOutput(PtrCoding, Option[0], 1);
-                  else if(BlockInfo[BlockSeq].SymbolsBlock[SymbolIndex].sym_len == 3)
-                     BitsOutput(PtrCoding, Option[1], 2);
-                  else if(BlockInfo[BlockSeq].SymbolsBlock[SymbolIndex].sym_len == 4)
-                     BitsOutput(PtrCoding, Option[2], 2);
-                  else
-                     ErrorMsg(BPE_STAGE_CODING_ERROR);
-               }
-            RiceCoding(BlockInfo[BlockSeq].SymbolsBlock[SymbolIndex].sym_mapped_pattern ,
-               BlockInfo[BlockSeq].SymbolsBlock[SymbolIndex].sym_len, Option, PtrCoding);
-            if (BlockInfo[BlockSeq].SymbolsBlock[SymbolIndex].type == ENUM_TYPE_CI)
+    int bi; // Block index
+    int si; // Symbol index
+    
+    // nkeffix : Implement StageStop in 122x0b1c3 section 4.2.3.1 Table 4-5
+    if (PtrCoding->PtrHeader->Header.Part2.StageStop_2Bits < 1 &&
+        (PtrCoding->PtrHeader->Header.Part2.BitPlaneStop_5Bits == PtrCoding->BitPlane - 1 ||
+        PtrCoding->altStageStop))
+        return;
+    
+    for (bi = 0; bi < BlocksInGaggles; bi++)
+    {
+        if (BlockInfo[bi].BitMaxAC < PtrCoding->BitPlane) continue;
+    
+        for (si = 0; si < MAX_SYMBOLS_IN_BLOCK; si++)
+        {
+            StrSymbolDetails *sym = &BlockInfo[bi].SymbolsBlock[si];
+            switch (sym->type)
             {
-               counter = 0;
-               for(i = 0; i < BlockInfo[BlockSeq].SymbolsBlock[SymbolIndex].sym_len; i++)
-                  if ((BlockInfo[BlockSeq].SymbolsBlock[SymbolIndex].sym_val & (1 << i)) >0)
-                     counter ++;
-                  BitsOutput(PtrCoding, BlockInfo[BlockSeq].SymbolsBlock[SymbolIndex].sign, counter);
-            }
+                case ENUM_TRAN_B:
+                case ENUM_TRAN_D:
+                case ENUM_TYPE_CI:
+                {
+                    if (sym->sym_len >= 2)
+                    {
+                        if (FlagCodeOptionOutput[sym->sym_len - 2] == FALSE)
+                        {
+                            FlagCodeOptionOutput[sym->sym_len - 2] = TRUE;
+                            switch (sym->sym_len)
+                            {
+                                case 2:  BitsOutput(PtrCoding, Option[0], 1); break;
+                                case 3:  BitsOutput(PtrCoding, Option[1], 2); break;
+                                case 4:  BitsOutput(PtrCoding, Option[2], 2); break;
+                                default: ErrorMsg(BPE_STAGE_CODING_ERROR);
+                            }
+                        }
+                    }
+                    RiceCoding(sym->sym_mapped_pattern, sym->sym_len, Option, PtrCoding);
+                    if (sym->type == ENUM_TYPE_CI)
+                    {
+                        int i;
+                        int counter = 0;
+                        for (i = 0; i < sym->sym_len; i++)
+                        {
+                            if (sym->sym_val & (1 << i)) counter++;
+                        }
+                        BitsOutput(PtrCoding, sym->sign, counter);
+                    }
 
-            BitPlaneSymbolReset(&(BlockInfo[BlockSeq].SymbolsBlock[SymbolIndex])) ;
-            break;
-         }
-      }
-   }
+                    BitPlaneSymbolReset(sym);
+                    break;
+                }
+            }
+        }
+    }
 }
 
 void StagesEnCodingGaggles3(StructCodingPara *PtrCoding,
-                         BitPlaneBits *BlockInfo,
-                         int BlocksInGaggles,
-                         uint8_t Option[],
-                         BOOL FlagCodeOptionOutput[])
+                            BitPlaneBits *BlockInfo,
+                            int BlocksInGaggles,
+                            uint8_t Option[],
+                            BOOL FlagCodeOptionOutput[])
 {
-   int SymbolIndex;
-   int BlockSeq;
-   short i;
-   short counter= 0;
-
-   // nkeffix : Implement StageStop in 122x0b1c3 section 4.2.3.1 Table 4-5
-   if (PtrCoding->PtrHeader->Header.Part2.StageStop_2Bits < 2 &&
-       (PtrCoding->PtrHeader->Header.Part2.BitPlaneStop_5Bits == PtrCoding->BitPlane - 1 ||
-        PtrCoding->altStageStop))
-      return;
-
-   for (BlockSeq = 0; BlockSeq < BlocksInGaggles; BlockSeq++)
-   {
-
-      if (BlockInfo[BlockSeq].BitMaxAC < PtrCoding->BitPlane)
-         continue;
-
-      for(SymbolIndex = 0; SymbolIndex < MAX_SYMBOLS_IN_BLOCK; SymbolIndex ++)
-      {
-         switch(BlockInfo[BlockSeq].SymbolsBlock[SymbolIndex].type)
-         { // TranGi+TranHi+TypeHij
-         case ENUM_TRAN_GI:
-         case ENUM_TRAN_HI:
-         case ENUM_TYPE_HIJ:
-            if (BlockInfo[BlockSeq].SymbolsBlock[SymbolIndex].sym_len > 1)
-               if(FlagCodeOptionOutput[BlockInfo[BlockSeq].SymbolsBlock[SymbolIndex].sym_len - 2] == FALSE)
-               {
-                  FlagCodeOptionOutput[BlockInfo[BlockSeq].SymbolsBlock[SymbolIndex].sym_len - 2] = TRUE;
-
-                  if(BlockInfo[BlockSeq].SymbolsBlock[SymbolIndex].sym_len == 2)
-                     BitsOutput(PtrCoding, Option[0], 1);
-                  else if(BlockInfo[BlockSeq].SymbolsBlock[SymbolIndex].sym_len == 3)
-                     BitsOutput(PtrCoding, Option[1], 2);
-                  else if(BlockInfo[BlockSeq].SymbolsBlock[SymbolIndex].sym_len == 4)
-                     BitsOutput(PtrCoding, Option[2], 2);
-                  else
-                     ErrorMsg(BPE_STAGE_CODING_ERROR);
-               }
-               RiceCoding(BlockInfo[BlockSeq].SymbolsBlock[SymbolIndex].sym_mapped_pattern , BlockInfo[BlockSeq].SymbolsBlock[SymbolIndex].sym_len, Option, PtrCoding);
-               if(BlockInfo[BlockSeq].SymbolsBlock[SymbolIndex].type == ENUM_TYPE_HIJ)
-               {
-                  counter = 0;
-                  for(i = 0; i < BlockInfo[BlockSeq].SymbolsBlock[SymbolIndex].sym_len; i++)
-                     if ((BlockInfo[BlockSeq].SymbolsBlock[SymbolIndex].sym_val & (1 << i)) >0)
-                        counter ++;
-                     BitsOutput(PtrCoding, BlockInfo[BlockSeq].SymbolsBlock[SymbolIndex].sign, counter);
-               }
-               BitPlaneSymbolReset(&(BlockInfo[BlockSeq].SymbolsBlock[SymbolIndex])) ;
-               break;
-         }
-      }
-   }
+    int bi; // Block index
+    int si; // Symbol index
+    
+    // nkeffix : Implement StageStop in 122x0b1c3 section 4.2.3.1 Table 4-5
+    if (PtrCoding->PtrHeader->Header.Part2.StageStop_2Bits < 2 &&
+        (PtrCoding->PtrHeader->Header.Part2.BitPlaneStop_5Bits == PtrCoding->BitPlane - 1 ||
+            PtrCoding->altStageStop))
+        return;
+    
+    for (bi = 0; bi < BlocksInGaggles; bi++)
+    {
+        if (BlockInfo[bi].BitMaxAC < PtrCoding->BitPlane) continue;
+    
+        for (si = 0; si < MAX_SYMBOLS_IN_BLOCK; si++)
+        {
+            StrSymbolDetails *sym = &BlockInfo[bi].SymbolsBlock[si];
+            
+            switch (sym->type)
+            {
+                case ENUM_TRAN_GI:
+                case ENUM_TRAN_HI:
+                case ENUM_TYPE_HIJ:
+                {
+                    if (sym->sym_len >= 2)
+                    {
+                        if (FlagCodeOptionOutput[sym->sym_len - 2] == FALSE)
+                        {
+                            FlagCodeOptionOutput[sym->sym_len - 2] = TRUE;
+                            switch (sym->sym_len)
+                            {
+                                case 2:  BitsOutput(PtrCoding, Option[0], 1); break;
+                                case 3:  BitsOutput(PtrCoding, Option[1], 2); break;
+                                case 4:  BitsOutput(PtrCoding, Option[2], 2); break;
+                                default: ErrorMsg(BPE_STAGE_CODING_ERROR);
+                            }
+                        }
+                    }
+                    RiceCoding(sym->sym_mapped_pattern , sym->sym_len, Option, PtrCoding);
+                    if (sym->type == ENUM_TYPE_HIJ)
+                    {
+                        int i;
+                        int counter = 0;
+                        for (i = 0; i < sym->sym_len; i++)
+                        {
+                            if (sym->sym_val & (1 << i)) counter++;
+                        }
+                        BitsOutput(PtrCoding, sym->sign, counter);
+                    }
+                    BitPlaneSymbolReset(sym);
+                    break;
+                }
+            }
+        }
+    }
 }
 
 extern void RiceDecoding(uint32_t *decoded,
